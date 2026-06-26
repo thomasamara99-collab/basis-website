@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Terms of Service — Basis</title>
+  <meta name="description" content="Basis terms of service. By using the app you agree to these terms." />
+  <link rel="icon" href="/favicon.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav class="nav">
+    <div class="container nav-inner">
+      <a href="/" class="nav-logo">
+        <div class="nav-logo-mark">B</div>
+        Basis
+      </a>
+      <ul class="nav-links">
+        <li><a href="/privacy">Privacy</a></li>
+        <li><a href="/terms">Terms</a></li>
+        <li><a href="/support">Support</a></li>
+      </ul>
+      <a href="https://apps.apple.com/app/id" class="btn btn-primary nav-cta">Download</a>
+      <button class="nav-toggle" aria-label="Toggle navigation" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <div class="legal-hero">
+    <div class="container">
+      <h1>Terms of Service</h1>
+      <p class="legal-effective">Effective: 23 June 2026</p>
+    </div>
+  </div>
+
+  <!-- CONTENT -->
+  <main>
+    <div class="container">
+      <div class="legal-content">
+
+        <div class="legal-section">
+          <h2>Acceptance of Terms</h2>
+          <p>By downloading or using Basis ("the App"), you agree to be bound by these Terms of Service. If you do not agree, do not use the App.</p>
+        </div>
+
+        <div class="legal-section">
+          <h2>Description of Service</h2>
+          <p>Basis is a finance education app that provides lessons, quizzes, and career preparation content. The App includes free content and a premium subscription ("Career Accelerator") that unlocks additional content.</p>
+        </div>
+
+        <div class="legal-section">
+          <h2>Account Registration</h2>
+          <p>You may use Basis as a guest without creating an account. If you create an account, you are responsible for maintaining the confidentiality of your login credentials and for all activity under your account. You must provide accurate information and keep it up to date.</p>
+        </div>
+
+        <div class="legal-section">
+          <h2>Career Accelerator Subscription</h2>
+          <p>The Career Accelerator is a paid subscription available on a monthly (£7.99/month) or annual (£49.99/year) basis. A 7-day free trial is available for new subscribers.</p>
+          <p>Subscriptions automatically renew at the end of each billing period unless cancelled at least 24 hours before the renewal date. You can manage or cancel your subscription through your Apple ID account settings.</p>
+          <p>No refunds are provided for partial subscription periods, except where required by applicable law.</p>
+        </div>
+
+        <div class="legal-section">
+          <h2>Content and Intellectual Property</h2>
+          <p>All content in Basis — including lessons, questions, curriculum, illustrations, and the Bax character — is owned by or licensed to us and protected by copyright law. You may not reproduce, distribute, or create derivative works from our content without our written permission.</p>
+          <p>The educational content in Basis is for learning purposes only and does not constitute financial advice.</p>
+        </div>
+
+        <div class="legal-section">
+          <h2>User Conduct</h2>
+          <p>You agree not to:</p>
+          <ul>
+            <li>Use the App for any unlawful purpose</li>
+            <li>Attempt to reverse-engineer or extract the App's content or source code</li>
+            <li>Share your account credentials with others</li>
+            <li>Circumvent any access controls or subscription gates</li>
+            <li>Submit false information when creating an account</li>
+          </ul>
+        </div>
+
+        <div class="legal-section">
+          <h2>Disclaimers</h2>
+          <p>Basis provides educational content only. Nothing in the App constitutes financial, investment, or professional advice. We make no warranties that the content is complete, accurate, or current. The App is provided "as is" and "as available."</p>
+        </div>
+
+        <div class="legal-section">
+          <h2>Limitation of Liability</h2>
+          <p>To the maximum extent permitted by applicable law, we are not liable for any indirect, incidental, or consequential damages arising from your use of Basis, including loss of data, profits, or career opportunities.</p>
+        </div>
+
+        <div class="legal-section">
+          <h2>Termination</h2>
+          <p>We may suspend or terminate your account if you violate these Terms. You may delete your account at any time. On termination, your access to premium content ends immediately and no refund is provided for unused subscription periods, except where required by law.</p>
+        </div>
+
+        <div class="legal-section">
+          <h2>Changes to Terms</h2>
+          <p>We may update these Terms. Continued use of the App after we post updated Terms constitutes your acceptance of those Terms. We will notify you of material changes via the App.</p>
+        </div>
+
+        <div class="legal-section">
+          <h2>Governing Law</h2>
+          <p>These Terms are governed by the laws of England and Wales. Any disputes shall be resolved in the courts of England and Wales.</p>
+        </div>
+
+        <div class="legal-section">
+          <h2>Contact</h2>
+          <p>For questions about these Terms, contact us at:</p>
+          <p><a href="mailto:legal@basisapp.co">legal@basisapp.co</a></p>
+        </div>
+
+      </div>
+    </div>
+  </main>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="container">
+      <div class="footer-inner">
+        <div class="footer-logo">
+          <div class="nav-logo-mark">B</div>
+          Basis
+        </div>
+        <nav class="footer-links">
+          <a href="/privacy">Privacy Policy</a>
+          <a href="/terms">Terms of Service</a>
+          <a href="/support">Support</a>
+        </nav>
+        <p class="footer-copy">&copy; 2026 Basis. All rights reserved.</p>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    const toggle = document.querySelector('.nav-toggle');
+    toggle.addEventListener('click', () => {
+      const open = document.body.classList.toggle('nav-open');
+      toggle.setAttribute('aria-expanded', open);
+    });
+    document.addEventListener('click', (e) => {
+      if (!e.target.closest('nav')) {
+        document.body.classList.remove('nav-open');
+        toggle.setAttribute('aria-expanded', false);
+      }
+    });
+  </script>
+
+</body>
+</html>

@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Support — Basis</title>
+  <meta name="description" content="Get help with Basis. Contact our support team or browse frequently asked questions." />
+  <link rel="icon" href="/favicon.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav class="nav">
+    <div class="container nav-inner">
+      <a href="/" class="nav-logo">
+        <div class="nav-logo-mark">B</div>
+        Basis
+      </a>
+      <ul class="nav-links">
+        <li><a href="/privacy">Privacy</a></li>
+        <li><a href="/terms">Terms</a></li>
+        <li><a href="/support">Support</a></li>
+      </ul>
+      <a href="https://apps.apple.com/app/id" class="btn btn-primary nav-cta">Download</a>
+      <button class="nav-toggle" aria-label="Toggle navigation" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <div class="support-hero">
+    <div class="container">
+      <h1>Support</h1>
+      <p>We're here to help with any questions about Basis.</p>
+    </div>
+  </div>
+
+  <!-- CONTENT -->
+  <main>
+    <div class="container">
+      <div class="support-content">
+
+        <div class="support-block">
+          <h2>Contact Us</h2>
+          <p>
+            Have a question, found a bug, or need help with your subscription?
+            Email us and we'll get back to you within 2 business days.
+          </p>
+          <div class="contact-card">
+            <div class="contact-card-icon">✉️</div>
+            <div>
+              <div class="contact-card-label">Email support</div>
+              <div class="contact-card-email">
+                <a href="mailto:privacy@basisapp.co">privacy@basisapp.co</a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="support-block">
+          <h2>Frequently Asked Questions</h2>
+          <div class="faq">
+
+            <details>
+              <summary>How do I cancel my Career Accelerator subscription?</summary>
+              <div class="faq-body">
+                Open <strong>Settings</strong> on your iPhone → tap your name → <strong>Subscriptions</strong> → <strong>Basis</strong>.
+                From there you can cancel or manage your subscription. Cancel at least 24 hours before your renewal date to avoid being charged.
+              </div>
+            </details>
+
+            <details>
+              <summary>Can I use Basis without creating an account?</summary>
+              <div class="faq-body">
+                Yes. Basis works fully as a guest — your XP, streak, and completed lessons are saved locally on your device.
+                Create an account only if you want to sync your progress across multiple devices.
+              </div>
+            </details>
+
+            <details>
+              <summary>How do I delete my account and data?</summary>
+              <div class="faq-body">
+                Email <a href="mailto:privacy@basisapp.co">privacy@basisapp.co</a> with the subject line
+                <strong>"Delete my account"</strong>. We'll process your request and confirm deletion within 7 business days.
+              </div>
+            </details>
+
+            <details>
+              <summary>Is my subscription automatically renewed?</summary>
+              <div class="faq-body">
+                Yes. Subscriptions renew automatically at the end of each billing period unless cancelled at least 24 hours before
+                the renewal date. You can manage this in your <strong>Apple ID settings</strong> under Subscriptions.
+              </div>
+            </details>
+
+            <details>
+              <summary>What is included in the free version?</summary>
+              <div class="faq-body">
+                All 11 learning tracks are completely free — covering Markets, Corporate Finance, Macro, Investment Management,
+                ESG, Derivatives, Credit, Macroeconomics, Private Equity, Financial Statement Analysis, and Fixed Income.
+                The Career Accelerator (IB interview prep, deal mechanics, LBO walkthroughs, mock Q&amp;A) requires a subscription.
+              </div>
+            </details>
+
+            <details>
+              <summary>Does the free trial charge me automatically?</summary>
+              <div class="faq-body">
+                Your 7-day free trial will convert to a paid subscription unless you cancel before the trial ends.
+                You can cancel at any time during the trial in your Apple ID settings — you won't be charged.
+              </div>
+            </details>
+
+            <details>
+              <summary>I lost my progress. What happened?</summary>
+              <div class="faq-body">
+                If you were using Basis as a guest (no account), your progress is stored locally on your device.
+                Deleting and reinstalling the app, or switching devices, will clear local data.
+                To avoid this, create an account and sign in — your progress will sync to the cloud automatically.
+              </div>
+            </details>
+
+            <details>
+              <summary>Is the content financial advice?</summary>
+              <div class="faq-body">
+                No. Basis provides educational content only. Nothing in the app constitutes financial, investment,
+                or professional advice. Always consult a qualified professional before making investment decisions.
+              </div>
+            </details>
+
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </main>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="container">
+      <div class="footer-inner">
+        <div class="footer-logo">
+          <div class="nav-logo-mark">B</div>
+          Basis
+        </div>
+        <nav class="footer-links">
+          <a href="/privacy">Privacy Policy</a>
+          <a href="/terms">Terms of Service</a>
+          <a href="/support">Support</a>
+        </nav>
+        <p class="footer-copy">&copy; 2026 Basis. All rights reserved.</p>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    const toggle = document.querySelector('.nav-toggle');
+    toggle.addEventListener('click', () => {
+      const open = document.body.classList.toggle('nav-open');
+      toggle.setAttribute('aria-expanded', open);
+    });
+    document.addEventListener('click', (e) => {
+      if (!e.target.closest('nav')) {
+        document.body.classList.remove('nav-open');
+        toggle.setAttribute('aria-expanded', false);
+      }
+    });
+  </script>
+
+</body>
+</html>
