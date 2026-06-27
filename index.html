@@ -37,6 +37,7 @@
 
   <!-- HERO -->
   <section class="hero">
+    <canvas id="hero-canvas" aria-hidden="true"></canvas>
     <div class="container hero-inner">
 
       <div class="hero-copy">
@@ -384,6 +385,130 @@
       </div>
     </div>
   </footer>
+
+  <!-- Particle canvas animation -->
+  <script>
+  (function () {
+    const canvas = document.getElementById('hero-canvas');
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+
+    let animId, particles = [];
+    const mouse = { x: null, y: null, radius: 140 };
+
+    // Brand palette: ~85% indigo, ~15% gold
+    function particleColor() {
+      return Math.random() < 0.15
+        ? `rgba(251,191,36,${(0.4 + Math.random() * 0.4).toFixed(2)})`
+        : `rgba(99,102,241,${(0.45 + Math.random() * 0.45).toFixed(2)})`;
+    }
+
+    function Particle() {
+      this.x = Math.random() * canvas.width;
+      this.y = Math.random() * canvas.height;
+      this.size = Math.random() * 1.8 + 0.5;
+      this.vx = (Math.random() - 0.5) * 0.38;
+      this.vy = (Math.random() - 0.5) * 0.38;
+      this.color = particleColor();
+    }
+
+    Particle.prototype.update = function () {
+      // Bounce off hero edges
+      if (this.x < 0 || this.x > canvas.width)  this.vx *= -1;
+      if (this.y < 0 || this.y > canvas.height) this.vy *= -1;
+
+      // Mouse repulsion
+      if (mouse.x !== null) {
+        const dx = mouse.x - this.x, dy = mouse.y - this.y;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        if (dist < mouse.radius && dist > 0) {
+          const force = (mouse.radius - dist) / mouse.radius;
+          this.x -= (dx / dist) * force * 4.5;
+          this.y -= (dy / dist) * force * 4.5;
+        }
+      }
+
+      this.x += this.vx;
+      this.y += this.vy;
+    };
+
+    Particle.prototype.draw = function () {
+      ctx.beginPath();
+      ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+      ctx.fillStyle = this.color;
+      ctx.fill();
+    };
+
+    function init() {
+      particles = [];
+      // Density: one particle per ~9 500px², capped for performance
+      const count = Math.min(Math.floor(canvas.width * canvas.height / 9500), 110);
+      for (let i = 0; i < count; i++) particles.push(new Particle());
+    }
+
+    function connect() {
+      const MAX = 118, MAX_SQ = MAX * MAX;
+      for (let a = 0; a < particles.length; a++) {
+        for (let b = a + 1; b < particles.length; b++) {
+          const dx = particles[a].x - particles[b].x;
+          const dy = particles[a].y - particles[b].y;
+          const dSq = dx * dx + dy * dy;
+          if (dSq > MAX_SQ) continue;
+
+          const opacity = (1 - dSq / MAX_SQ) * 0.48;
+
+          // Lines near the cursor glow brighter/whiter
+          let bright = false;
+          if (mouse.x !== null) {
+            const mdx = particles[a].x - mouse.x, mdy = particles[a].y - mouse.y;
+            bright = (mdx * mdx + mdy * mdy) < mouse.radius * mouse.radius;
+          }
+
+          ctx.strokeStyle = bright
+            ? `rgba(180,180,255,${(opacity * 1.8).toFixed(2)})`
+            : `rgba(99,102,241,${opacity.toFixed(2)})`;
+          ctx.lineWidth = 0.6;
+          ctx.beginPath();
+          ctx.moveTo(particles[a].x, particles[a].y);
+          ctx.lineTo(particles[b].x, particles[b].y);
+          ctx.stroke();
+        }
+      }
+    }
+
+    function animate() {
+      animId = requestAnimationFrame(animate);
+      if (document.hidden) return;
+      // Semi-transparent fill creates a subtle motion trail
+      ctx.fillStyle = 'rgba(0,0,0,0.18)';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      particles.forEach(p => { p.update(); p.draw(); });
+      connect();
+    }
+
+    function resize() {
+      // Size canvas to match the hero section exactly
+      canvas.width  = canvas.offsetWidth;
+      canvas.height = canvas.offsetHeight;
+      init();
+    }
+
+    window.addEventListener('resize', resize);
+
+    // Track mouse relative to the canvas, not the page
+    window.addEventListener('mousemove', function (e) {
+      const r = canvas.getBoundingClientRect();
+      mouse.x = e.clientX - r.left;
+      mouse.y = e.clientY - r.top;
+    });
+    window.addEventListener('mouseleave', function () {
+      mouse.x = null; mouse.y = null;
+    });
+
+    resize();
+    animate();
+  })();
+  </script>
 
   <script>
     const toggle = document.querySelector('.nav-toggle');

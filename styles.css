@@ -319,15 +319,26 @@ ul, ol { list-style: none; }
   overflow: hidden;
 }
 
+/* Dark vignette overlay sits above canvas, keeps text readable */
 .hero::before {
   content: '';
   position: absolute;
-  top: -200px;
-  right: -200px;
-  width: 600px;
-  height: 600px;
-  background: radial-gradient(circle, rgba(99, 102, 241, 0.12) 0%, transparent 70%);
+  inset: 0;
+  background: linear-gradient(
+    to bottom,
+    rgba(0, 0, 0, 0.1) 0%,
+    rgba(0, 0, 0, 0.55) 100%
+  );
+  z-index: 1;
   pointer-events: none;
+}
+
+#hero-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
 }
 
 .hero-inner {
@@ -335,7 +346,18 @@ ul, ol { list-style: none; }
   grid-template-columns: 1fr;
   gap: var(--sp-12);
   align-items: center;
+  position: relative;
+  z-index: 2;
 }
+
+/* Fade-up entrance for hero content */
+@keyframes hero-fade-up {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.hero-copy    { animation: hero-fade-up 0.85s ease 0.35s both; }
+.hero-visual  { animation: hero-fade-up 0.85s ease 0.6s  both; }
 
 @media (min-width: 900px) {
   .hero-inner {
