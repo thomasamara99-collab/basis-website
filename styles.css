@@ -28,7 +28,7 @@
 
   /* Fonts */
   --font-sans:      'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
-  --font-display:   'Syne', 'Plus Jakarta Sans', system-ui, sans-serif;
+  --font-display:   'Outfit', 'Plus Jakarta Sans', system-ui, sans-serif;
 
   /* Spacing (4pt scale) */
   --sp-1:   4px;
@@ -570,8 +570,8 @@ ul, ol { list-style: none; }
 .stat-number {
   font-family: var(--font-display);
   font-size: 32px;
-  font-weight: 800;
-  letter-spacing: -0.03em;
+  font-weight: 700;
+  letter-spacing: -0.02em;
   color: var(--text-primary);
   letter-spacing: -0.03em;
   line-height: 1;
