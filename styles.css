@@ -462,7 +462,7 @@ ul, ol { list-style: none; }
   width: 0;
   height: 0;
   --or: 130px;
-  animation: orbit-spin 10s linear infinite;
+  animation: orbit-spin 36s linear infinite;
   animation-delay: var(--od, 0s);
 }
 
@@ -474,7 +474,7 @@ ul, ol { list-style: none; }
   position: absolute;
   left: var(--or);
   top: 0;
-  animation: orbit-counter 10s linear infinite;
+  animation: orbit-counter 36s linear infinite;
   animation-delay: var(--od, 0s);
 }
 
