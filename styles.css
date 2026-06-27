@@ -615,18 +615,14 @@ ul, ol { list-style: none; }
   box-shadow: 0 16px 48px var(--cm, rgba(99, 102, 241, 0.1));
 }
 
-.feature-icon {
-  width: 48px;
-  height: 48px;
-  background: var(--cm, var(--accent-muted));
-  border: 1px solid var(--cb, rgba(99, 102, 241, 0.25));
-  border-radius: var(--r-md);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-bottom: var(--sp-4);
-  font-size: 22px;
-  box-shadow: 0 4px 20px var(--cm, transparent);
+.feature-num {
+  font-family: var(--font-display);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  color: var(--cc, var(--accent));
+  margin-bottom: var(--sp-3);
+  opacity: 0.9;
 }
 
 .feature-card h3 {
