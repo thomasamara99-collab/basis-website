@@ -28,7 +28,7 @@
 
   /* Fonts */
   --font-sans:      'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
-  --font-display:   'Space Grotesk', 'Plus Jakarta Sans', system-ui, sans-serif;
+  --font-display:   'Syne', 'Plus Jakarta Sans', system-ui, sans-serif;
 
   /* Spacing (4pt scale) */
   --sp-1:   4px;
@@ -570,7 +570,8 @@ ul, ol { list-style: none; }
 .stat-number {
   font-family: var(--font-display);
   font-size: 32px;
-  font-weight: 700;
+  font-weight: 800;
+  letter-spacing: -0.03em;
   color: var(--text-primary);
   letter-spacing: -0.03em;
   line-height: 1;
@@ -632,6 +633,7 @@ ul, ol { list-style: none; }
   font-family: var(--font-display);
   font-size: 17px;
   font-weight: 700;
+  letter-spacing: -0.01em;
   color: var(--text-primary);
   margin-bottom: var(--sp-2);
 }
