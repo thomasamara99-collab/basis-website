@@ -319,35 +319,25 @@ ul, ol { list-style: none; }
   overflow: hidden;
 }
 
-/* Dark vignette overlay sits above canvas, keeps text readable */
-.hero::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(
-    to bottom,
-    rgba(0, 0, 0, 0.1) 0%,
-    rgba(0, 0, 0, 0.55) 100%
-  );
-  z-index: 1;
+/* Canvas is now fixed — covers the whole viewport at all times */
+#hero-canvas {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
   pointer-events: none;
 }
 
-#hero-canvas {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  z-index: 0;
-}
+/* Hero pseudo-element no longer needed — canvas provides the bg */
+.hero::before { display: none; }
 
 .hero-inner {
   display: grid;
   grid-template-columns: 1fr;
   gap: var(--sp-12);
   align-items: center;
-  position: relative;
-  z-index: 2;
 }
 
 /* Fade-up entrance for hero content */
@@ -553,7 +543,9 @@ ul, ol { list-style: none; }
   border-top: 1px solid var(--hairline);
   border-bottom: 1px solid var(--hairline);
   padding-block: var(--sp-8);
-  background: var(--surface);
+  background: rgba(13, 14, 18, 0.82);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
 }
 
 .stats-grid {
@@ -597,7 +589,9 @@ ul, ol { list-style: none; }
 @media (min-width: 1000px) { .features-grid { grid-template-columns: repeat(3, 1fr); } }
 
 .feature-card {
-  background: var(--surface);
+  background: rgba(13, 14, 18, 0.86);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
   border: 1px solid var(--border);
   border-radius: var(--r-xl);
   padding: var(--sp-6);
@@ -640,7 +634,9 @@ ul, ol { list-style: none; }
    CURRICULUM / TRACKS
    ============================================================ */
 .curriculum-section {
-  background: var(--surface);
+  background: rgba(13, 14, 18, 0.82);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
   border-top: 1px solid var(--hairline);
   border-bottom: 1px solid var(--hairline);
 }
@@ -656,7 +652,9 @@ ul, ol { list-style: none; }
   display: flex;
   align-items: center;
   gap: var(--sp-3);
-  background: var(--surface-raised);
+  background: rgba(22, 24, 31, 0.88);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
   border: 1px solid var(--border);
   border-radius: var(--r-lg);
   padding: var(--sp-3) var(--sp-4);
@@ -708,7 +706,9 @@ ul, ol { list-style: none; }
 
 .ladder-step {
   flex: 1;
-  background: var(--surface);
+  background: rgba(13, 14, 18, 0.86);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
   border: 1px solid var(--border);
   border-radius: var(--r-lg);
   padding: var(--sp-4) var(--sp-5);
@@ -719,7 +719,7 @@ ul, ol { list-style: none; }
 
 .ladder-step:hover {
   border-color: rgba(99, 102, 241, 0.35);
-  background: var(--surface-raised);
+  background: rgba(22, 24, 31, 0.9);
 }
 
 .ladder-step.md {
@@ -782,7 +782,7 @@ ul, ol { list-style: none; }
    PREMIUM / PRICING
    ============================================================ */
 .premium-section {
-  background: var(--bg);
+  background: transparent;
   text-align: center;
 }
 
@@ -832,7 +832,9 @@ ul, ol { list-style: none; }
 }
 
 .pricing-card {
-  background: var(--surface);
+  background: rgba(13, 14, 18, 0.86);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
   border: 1px solid var(--border);
   border-radius: var(--r-xl);
   padding: var(--sp-6);
@@ -905,7 +907,7 @@ ul, ol { list-style: none; }
    FINAL CTA
    ============================================================ */
 .cta-section {
-  background: linear-gradient(180deg, var(--bg) 0%, rgba(99, 102, 241, 0.06) 50%, var(--bg) 100%);
+  background: linear-gradient(180deg, transparent 0%, rgba(99, 102, 241, 0.07) 50%, transparent 100%);
   text-align: center;
   padding-block: var(--sp-24);
 }
@@ -931,7 +933,9 @@ ul, ol { list-style: none; }
 footer {
   border-top: 1px solid var(--hairline);
   padding-block: var(--sp-10);
-  background: var(--bg);
+  background: rgba(0, 0, 0, 0.88);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
 }
 
 .footer-inner {
