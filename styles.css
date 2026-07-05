@@ -640,6 +640,100 @@ ul, ol { list-style: none; }
 }
 
 /* ============================================================
+   THE FLOOR
+   ============================================================ */
+.floor-section {
+  background: rgba(13, 14, 18, 0.82);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  border-top: 1px solid var(--hairline);
+}
+
+.floor-inner {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--sp-12);
+  align-items: center;
+}
+
+@media (min-width: 900px) {
+  .floor-inner { grid-template-columns: 1.1fr 1fr; }
+}
+
+.floor-points {
+  margin-top: var(--sp-8);
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-6);
+}
+
+.floor-point {
+  border-left: 2px solid rgba(99, 102, 241, 0.45);
+  padding-left: var(--sp-5);
+}
+
+.floor-point h4 {
+  font-family: var(--font-display);
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--text-primary);
+  margin-bottom: var(--sp-1);
+}
+
+.floor-point p {
+  font-size: 14px;
+  color: var(--text-secondary);
+  line-height: 1.65;
+}
+
+/* Overlapping device frames */
+.phone-stack {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  padding: var(--sp-8) 0;
+}
+
+.phone {
+  border-radius: 36px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: #000;
+  overflow: hidden;
+  box-shadow:
+    0 24px 64px rgba(0, 0, 0, 0.55),
+    0 0 0 6px rgba(20, 21, 28, 0.9);
+}
+
+.phone img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.phone-front {
+  width: 250px;
+  position: relative;
+  z-index: 2;
+  margin-left: 90px;
+}
+
+.phone-back {
+  width: 225px;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-96%, -46%) rotate(-6deg);
+  z-index: 1;
+  opacity: 0.88;
+}
+
+@media (max-width: 560px) {
+  .phone-front { width: 210px; margin-left: 64px; }
+  .phone-back  { width: 185px; }
+}
+
+/* ============================================================
    CURRICULUM / TRACKS
    ============================================================ */
 .curriculum-section {
