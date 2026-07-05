@@ -845,7 +845,7 @@ ul, ol { list-style: none; }
   width: 2px;
   background: linear-gradient(180deg,
     rgba(99, 102, 241, 0.2) 0%,
-    rgba(124, 92, 246, 0.55) 70%,
+    rgba(130, 52, 250, 0.55) 70%,
     rgba(251, 191, 36, 0.8) 100%);
 }
 
@@ -861,7 +861,7 @@ ul, ol { list-style: none; }
   height: 12px;
   border-radius: 50%;
   background: var(--bg);
-  border: 2px solid rgba(124, 92, 246, 0.7);
+  border: 2px solid rgba(130, 52, 250, 0.7);
   flex-shrink: 0;
   align-self: center;
   position: relative;
@@ -905,7 +905,7 @@ ul, ol { list-style: none; }
   content: '';
   position: absolute;
   inset: -12%;
-  background: radial-gradient(circle at 50% 45%, rgba(124, 58, 237, 0.32) 0%, transparent 62%);
+  background: radial-gradient(circle at 50% 45%, rgba(130, 52, 250, 0.3) 0%, transparent 62%);
   pointer-events: none;
   z-index: 0;
 }
@@ -914,7 +914,7 @@ ul, ol { list-style: none; }
   content: '';
   position: absolute;
   inset: -18%;
-  background: radial-gradient(circle at 50% 60%, rgba(124, 58, 237, 0.26) 0%, transparent 60%);
+  background: radial-gradient(circle at 50% 60%, rgba(130, 52, 250, 0.24) 0%, transparent 60%);
   pointer-events: none;
 }
 
