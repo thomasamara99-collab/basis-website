@@ -293,55 +293,67 @@
   </section>
 
   <!-- CAREER LADDER -->
-  <section class="section">
-    <div class="container">
-      <div class="text-center">
+  <section class="section career-section">
+    <div class="container career-inner">
+      <div class="phone-solo">
+        <div class="phone">
+          <img src="/screen-profile.png" alt="A Basis profile at Vice President level — 2,240 XP, a 10-day streak, and 12 of 15 badges earned" width="1125" height="2436" loading="lazy" />
+        </div>
+      </div>
+      <div class="career-copy">
         <p class="section-label">Your Progress</p>
-        <h2 class="section-heading">Start where you are</h2>
-        <p class="section-sub" style="margin-inline:auto;">
+        <h2 class="section-heading">Start as an Intern.<br>Leave as an MD.</h2>
+        <p class="section-sub" style="margin-bottom:0;">
           Every lesson earns XP and builds your knowledge. Keep showing up,
           and you'll be surprised how quickly it compounds — whether you're
           learning for fun or heading somewhere specific.
         </p>
-      </div>
-      <div class="ladder-wrap">
-        <div class="ladder">
-          <div class="ladder-step">
-            <span class="ladder-emoji">&#128203;</span>
+        <div class="ladder-v">
+          <div class="lv-row">
+            <span class="lv-node"></span>
             <div class="ladder-title">Intern</div>
             <div class="ladder-xp">0 XP</div>
           </div>
-          <div class="ladder-arrow" aria-hidden="true">&#8594;</div>
-          <div class="ladder-step">
-            <span class="ladder-emoji">&#128187;</span>
+          <div class="lv-row">
+            <span class="lv-node"></span>
             <div class="ladder-title">Analyst</div>
             <div class="ladder-xp">150 XP</div>
           </div>
-          <div class="ladder-arrow" aria-hidden="true">&#8594;</div>
-          <div class="ladder-step">
-            <span class="ladder-emoji">&#128200;</span>
+          <div class="lv-row">
+            <span class="lv-node"></span>
             <div class="ladder-title">Associate</div>
             <div class="ladder-xp">500 XP</div>
           </div>
-          <div class="ladder-arrow" aria-hidden="true">&#8594;</div>
-          <div class="ladder-step">
-            <span class="ladder-emoji">&#128081;</span>
+          <div class="lv-row">
+            <span class="lv-node"></span>
             <div class="ladder-title">Vice President</div>
             <div class="ladder-xp">1,200 XP</div>
           </div>
-          <div class="ladder-arrow" aria-hidden="true">&#8594;</div>
-          <div class="ladder-step md">
-            <span class="ladder-emoji">&#11088;</span>
+          <div class="lv-row md">
+            <span class="lv-node"></span>
             <div class="ladder-title">Managing Director</div>
             <div class="ladder-xp">2,500 XP</div>
           </div>
         </div>
         <p class="ladder-blurb">
           One right answer = 10 XP. A few lessons a week adds up fast.
-          Come as a complete beginner — leave understanding finance the way
-          the professionals do.
         </p>
       </div>
+    </div>
+  </section>
+
+  <!-- GALLERY -->
+  <section class="section gallery-section">
+    <div class="container text-center">
+      <p class="section-label">A Quick Look</p>
+      <h2 class="section-heading">See it in action</h2>
+    </div>
+    <div class="gallery-strip">
+      <img src="/gallery-1.jpg" alt="Master finance in 5 minutes a day" width="640" height="1385" loading="lazy" class="gallery-shot" />
+      <img src="/gallery-2.jpg" alt="Trade real market history on The Floor" width="640" height="1385" loading="lazy" class="gallery-shot" />
+      <img src="/gallery-3.jpg" alt="Size your conviction on every call" width="640" height="1385" loading="lazy" class="gallery-shot" />
+      <img src="/gallery-4.jpg" alt="Build a streak that sticks" width="640" height="1385" loading="lazy" class="gallery-shot" />
+      <img src="/gallery-5.jpg" alt="Climb from Intern to Managing Director" width="640" height="1385" loading="lazy" class="gallery-shot" />
     </div>
   </section>
 
@@ -437,11 +449,12 @@
     let animId, particles = [];
     const mouse = { x: null, y: null, radius: 140 };
 
-    // Brand palette: ~85% indigo, ~15% gold
+    // Brand palette: ~14% gold, ~43% indigo, ~43% violet
     function particleColor() {
-      return Math.random() < 0.15
-        ? `rgba(251,191,36,${(0.4 + Math.random() * 0.4).toFixed(2)})`
-        : `rgba(99,102,241,${(0.45 + Math.random() * 0.45).toFixed(2)})`;
+      const r = Math.random();
+      if (r < 0.14) return `rgba(251,191,36,${(0.4 + Math.random() * 0.4).toFixed(2)})`;
+      if (r < 0.57) return `rgba(99,102,241,${(0.45 + Math.random() * 0.45).toFixed(2)})`;
+      return `rgba(139,92,246,${(0.45 + Math.random() * 0.45).toFixed(2)})`;
     }
 
     function Particle() {
@@ -506,8 +519,8 @@
           }
 
           ctx.strokeStyle = bright
-            ? `rgba(180,180,255,${(opacity * 1.8).toFixed(2)})`
-            : `rgba(99,102,241,${opacity.toFixed(2)})`;
+            ? `rgba(190,175,255,${(opacity * 1.8).toFixed(2)})`
+            : `rgba(118,88,246,${opacity.toFixed(2)})`;
           ctx.lineWidth = 0.6;
           ctx.beginPath();
           ctx.moveTo(particles[a].x, particles[a].y);
@@ -520,8 +533,8 @@
     function animate() {
       animId = requestAnimationFrame(animate);
       if (document.hidden) return;
-      // Semi-transparent fill creates a subtle motion trail
-      ctx.fillStyle = 'rgba(0,0,0,0.18)';
+      // Semi-transparent fill creates a subtle motion trail (purple-black tint)
+      ctx.fillStyle = 'rgba(10,5,20,0.18)';
       ctx.fillRect(0, 0, canvas.width, canvas.height);
       particles.forEach(p => { p.update(); p.draw(); });
       connect();
