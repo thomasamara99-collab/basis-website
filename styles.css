@@ -10,10 +10,10 @@
   --hairline:       rgba(255, 255, 255, 0.07);
 
   /* Brand */
-  --accent:         #6366F1;
-  --accent-hover:   #4F46E5;
-  --accent-muted:   rgba(99, 102, 241, 0.14);
-  --accent-glow:    rgba(99, 102, 241, 0.25);
+  --accent:         #8234FA;
+  --accent-hover:   #6E1EE0;
+  --accent-muted:   rgba(130, 52, 250, 0.14);
+  --accent-glow:    rgba(130, 52, 250, 0.25);
 
   /* Semantic */
   --gold:           #FBBF24;
@@ -368,7 +368,7 @@ ul, ol { list-style: none; }
   text-transform: uppercase;
   padding: 5px 12px;
   border-radius: var(--r-pill);
-  border: 1px solid rgba(99, 102, 241, 0.25);
+  border: 1px solid rgba(130, 52, 250, 0.25);
   margin-bottom: var(--sp-5);
 }
 
@@ -384,7 +384,7 @@ ul, ol { list-style: none; }
 
 .hero h1 em {
   font-style: normal;
-  background: linear-gradient(135deg, var(--accent) 0%, #818CF8 100%);
+  background: linear-gradient(135deg, var(--accent) 0%, #A265FF 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -433,7 +433,7 @@ ul, ol { list-style: none; }
   bottom: 0;
   left: 50%;
   transform: translateX(-50%);
-  filter: drop-shadow(0 24px 48px rgba(99, 102, 241, 0.25));
+  filter: drop-shadow(0 24px 48px rgba(130, 52, 250, 0.25));
 }
 
 /* Floating gamification badges around the mascot */
@@ -532,7 +532,7 @@ ul, ol { list-style: none; }
   object-fit: contain;
   margin: 0 auto var(--sp-4);
   display: block;
-  filter: drop-shadow(0 8px 16px rgba(99, 102, 241, 0.3));
+  filter: drop-shadow(0 8px 16px rgba(130, 52, 250, 0.3));
 }
 
 /* App icon display (e.g. hero background decoration) */
@@ -541,7 +541,7 @@ ul, ol { list-style: none; }
   height: 64px;
   border-radius: 16px;
   object-fit: cover;
-  box-shadow: 0 12px 32px rgba(99, 102, 241, 0.35);
+  box-shadow: 0 12px 32px rgba(130, 52, 250, 0.35);
 }
 
 /* ============================================================
@@ -602,7 +602,7 @@ ul, ol { list-style: none; }
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
   border: 1px solid rgba(255, 255, 255, 0.07);
-  border-top: 1px solid rgba(99, 102, 241, 0.45);
+  border-top: 1px solid rgba(130, 52, 250, 0.45);
   border-radius: var(--r-xl);
   padding: var(--sp-6) var(--sp-6) var(--sp-8);
   transition: border-color 0.25s, transform 0.25s, box-shadow 0.25s;
@@ -610,9 +610,9 @@ ul, ol { list-style: none; }
 
 .feature-card:hover {
   border-color: rgba(255, 255, 255, 0.11);
-  border-top-color: rgba(99, 102, 241, 0.75);
+  border-top-color: rgba(130, 52, 250, 0.75);
   transform: translateY(-3px);
-  box-shadow: 0 20px 48px rgba(0, 0, 0, 0.35), 0 0 0 1px rgba(99, 102, 241, 0.08);
+  box-shadow: 0 20px 48px rgba(0, 0, 0, 0.35), 0 0 0 1px rgba(130, 52, 250, 0.08);
 }
 
 .feature-num {
@@ -620,7 +620,7 @@ ul, ol { list-style: none; }
   font-size: 11px;
   font-weight: 500;
   letter-spacing: 0.1em;
-  color: rgba(99, 102, 241, 0.6);
+  color: rgba(130, 52, 250, 0.6);
   margin-bottom: var(--sp-3);
 }
 
@@ -668,7 +668,7 @@ ul, ol { list-style: none; }
 }
 
 .floor-point {
-  border-left: 2px solid rgba(99, 102, 241, 0.45);
+  border-left: 2px solid rgba(130, 52, 250, 0.45);
   padding-left: var(--sp-5);
 }
 
@@ -844,7 +844,7 @@ ul, ol { list-style: none; }
   bottom: 8px;
   width: 2px;
   background: linear-gradient(180deg,
-    rgba(99, 102, 241, 0.2) 0%,
+    rgba(130, 52, 250, 0.2) 0%,
     rgba(130, 52, 250, 0.55) 70%,
     rgba(251, 191, 36, 0.8) 100%);
 }
@@ -1010,8 +1010,8 @@ ul, ol { list-style: none; }
 }
 
 .pricing-card.featured {
-  background: linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(251, 191, 36, 0.05) 100%);
-  border-color: rgba(99, 102, 241, 0.4);
+  background: linear-gradient(135deg, rgba(130, 52, 250, 0.1) 0%, rgba(251, 191, 36, 0.05) 100%);
+  border-color: rgba(130, 52, 250, 0.4);
 }
 
 .pricing-badge {
@@ -1074,7 +1074,7 @@ ul, ol { list-style: none; }
    FINAL CTA
    ============================================================ */
 .cta-section {
-  background: linear-gradient(180deg, transparent 0%, rgba(99, 102, 241, 0.07) 50%, transparent 100%);
+  background: linear-gradient(180deg, transparent 0%, rgba(130, 52, 250, 0.07) 50%, transparent 100%);
   text-align: center;
   padding-block: var(--sp-24);
 }
@@ -1314,7 +1314,7 @@ details {
   overflow: hidden;
 }
 
-details[open] { border-color: rgba(99, 102, 241, 0.35); }
+details[open] { border-color: rgba(130, 52, 250, 0.35); }
 
 summary {
   display: flex;
