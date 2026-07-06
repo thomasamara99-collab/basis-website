@@ -218,7 +218,15 @@ ul, ol { list-style: none; }
   .nav-links {
     display: none;
     position: fixed;
-    inset: 60px 0 0;
+    top: 60px;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    /* Explicit height — iOS Safari won't reliably stretch a fixed+flex
+       box from top/bottom alone, which collapsed this to 0px. */
+    height: calc(100vh - 60px);
+    height: calc(100dvh - 60px);
+    overflow-y: auto;
     background: rgba(0, 0, 0, 0.97);
     flex-direction: column;
     align-items: center;
@@ -227,7 +235,7 @@ ul, ol { list-style: none; }
     z-index: 99;
   }
   .nav-links a { font-size: 20px; }
-  .nav-cta { display: none; }
+  .nav-inner .nav-cta { display: none; }
   body.nav-open .nav-links { display: flex; }
   body.nav-open .nav-toggle span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
   body.nav-open .nav-toggle span:nth-child(2) { opacity: 0; }
