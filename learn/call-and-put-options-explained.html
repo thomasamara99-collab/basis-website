@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Call and Put Options Explained for Beginners | Basis</title>
+  <meta name="description" content="An option is the right, not the obligation, to buy or sell at a set price. Learn how calls and puts work, moneyness, and intrinsic vs time value." />
+  <meta property="og:title" content="Call and Put Options Explained for Beginners | Basis" />
+  <meta property="og:description" content="An option is the right, not the obligation, to buy or sell at a set price. Learn how calls and puts work, moneyness, and intrinsic vs time value." />
+  <meta property="og:type" content="article" />
+  <meta property="og:url" content="https://www.basisfinance.app/learn/call-and-put-options-explained" />
+  <meta property="og:image" content="https://www.basisfinance.app/icon.png" />
+  <link rel="canonical" href="https://www.basisfinance.app/learn/call-and-put-options-explained" />
+  <link rel="icon" href="/favicon.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/styles.css" />
+
+  <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "headline": "Call and put options, explained",
+  "description": "An option is the right, not the obligation, to buy or sell at a set price. Learn how calls and puts work, moneyness, and intrinsic vs time value.",
+  "author": {
+    "@type": "Person",
+    "name": "Thomas Amara"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "Basis",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://www.basisfinance.app/icon.png"
+    }
+  },
+  "mainEntityOfPage": "https://www.basisfinance.app/learn/call-and-put-options-explained",
+  "image": "https://www.basisfinance.app/icon.png",
+  "inLanguage": "en"
+}
+  </script>
+</head>
+<body>
+
+  <nav class="nav">
+    <div class="container nav-inner">
+      <a href="/" class="nav-logo">
+        <img src="/icon.png" alt="" class="nav-logo-mark" />
+        Basis
+      </a>
+      <ul class="nav-links">
+        <li><a href="/learn">Learn</a></li>
+        <li><a href="/support">Support</a></li>
+        <li><a href="/privacy">Privacy</a></li>
+        <li><a href="/terms">Terms</a></li>
+      </ul>
+      <a href="https://apps.apple.com/app/basis-learn-finance-markets/id6784982377" class="btn btn-primary nav-cta">Download</a>
+      <button class="nav-toggle" aria-label="Toggle navigation" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </nav>
+
+  <article class="article">
+    <div class="container article-inner">
+      <div class="breadcrumb">
+        <a href="/learn">Learn</a>
+        <span class="sep">/</span>
+        <span>Derivatives</span>
+      </div>
+      <p class="article-eyebrow">Derivatives</p>
+      <h1 class="article-title">Call and put options, explained</h1>
+      <p class="article-lead">An option gives its holder the right — but not the obligation — to buy or sell something at a fixed price, by a fixed date. That single idea, "the right but not the obligation," is the key to the entire world of options.</p>
+      <p class="article-meta">6 min read</p>
+
+      <div class="prose">
+        <p>Options sound intimidating, but the core concept is intuitive. You’re paying a small amount now for the <em>choice</em> to make a trade later — a choice you’ll only use if it works in your favour. There are two basic flavours: calls and puts.</p>
+
+        <h2>The call option: the right to buy</h2>
+        <p>A <strong>call option</strong> gives its buyer the right to <em>buy</em> the underlying asset at a fixed price — the <strong>strike price</strong> — on or before the expiry date. The buyer pays a fee upfront, called the premium, for that right.</p>
+        <p>If the asset’s price rises above the strike, the call is worth using: the holder can buy cheap and is "in the money," profiting by the difference minus the premium. If the price stays below the strike, they simply let the option expire — and the most they can lose is the premium they paid. The seller of the call takes the opposite side: they pocket the premium, but carry the risk of having to sell at the strike price no matter how high the asset climbs.</p>
+
+        <h2>The put option: the right to sell</h2>
+        <p>A <strong>put option</strong> is the mirror image — it gives the buyer the right to <em>sell</em> the underlying at the strike price. Puts make money when prices <em>fall</em>. If the asset drops below the strike, the put is in the money; if it rises above, the put expires worthless and again the buyer loses only the premium.</p>
+        <p>This makes puts the classic <strong>hedge</strong>. An investor holding <a href="/learn/what-is-a-stock">shares</a> can buy puts to cap their downside: if the market tumbles, the puts pay out and cushion the loss; if it rises, the shares gain and all that was lost is the small premium. It’s a bit like insurance on a portfolio.</p>
+
+        <h2>Moneyness: where the price sits</h2>
+        <p><strong>Moneyness</strong> just describes where the current price is relative to the strike:</p>
+        <ul>
+          <li><strong>In the money (ITM)</strong> — exercising now would be profitable.</li>
+          <li><strong>At the money (ATM)</strong> — the price is roughly at the strike.</li>
+          <li><strong>Out of the money (OTM)</strong> — exercising now would not pay.</li>
+        </ul>
+        <p>There’s also a difference in <em>when</em> you can exercise: <strong>European</strong> options can only be exercised at expiry, while <strong>American</strong> options can be exercised any time up to it. Most stock-index options are European; most single-stock options in the US are American.</p>
+
+        <h2>Intrinsic value vs time value</h2>
+        <p>An option’s premium is made of two parts:</p>
+        <ul>
+          <li><strong>Intrinsic value</strong> — what it’s worth if exercised right now. An out-of-the-money option has zero intrinsic value.</li>
+          <li><strong>Time value</strong> — the extra premium reflecting the <em>chance</em> the option moves further into the money before it expires.</li>
+        </ul>
+        <p>Time value bleeds away as expiry approaches, and that decay speeds up near the end. It’s why an at-the-money option can still carry a meaningful price despite having no intrinsic value — there’s still time for it to go either way. Options are a natural next step once you understand <a href="/learn/risk-and-return">risk and return</a>, because they let you shape a payoff precisely.</p>
+
+        <div class="callout">
+          <p class="callout-label">Key takeaways</p>
+          <ul>
+            <li>An option is the right, not the obligation, to buy or sell at a set strike price.</li>
+            <li>A <strong>call</strong> profits when prices rise; a <strong>put</strong> profits when they fall.</li>
+            <li>An option buyer’s maximum loss is the premium paid.</li>
+            <li>Premium = intrinsic value + time value, and time value decays toward expiry.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="article-cta">
+        <h3>Learn this properly, in five minutes a day</h3>
+        <p>Basis turns concepts like this into short, interactive lessons — with quizzes, XP, and a daily market game built on real financial history.</p>
+        <a href="https://apps.apple.com/app/basis-learn-finance-markets/id6784982377" class="btn btn-primary btn-lg" target="_blank" rel="noopener">Get Basis free</a>
+      </div>
+    </div>
+
+    <div class="container">
+      <div class="related">
+        <p class="related-label">Keep learning</p>
+        <div class="related-list">
+        <a class="related-card" href="/learn/risk-and-return">
+          <span class="rc-tag">Investing</span>
+          <span class="rc-title">Risk and return: the core trade-off</span>
+        </a>
+        <a class="related-card" href="/learn/what-is-a-stock">
+          <span class="rc-tag">Equities</span>
+          <span class="rc-title">What is a stock?</span>
+        </a>
+        <a class="related-card" href="/learn/what-is-a-bond">
+          <span class="rc-tag">Fixed Income</span>
+          <span class="rc-title">What is a bond?</span>
+        </a>
+        </div>
+      </div>
+    </div>
+  </article>
+
+  <footer>
+    <div class="container">
+      <div class="footer-inner">
+        <div class="footer-logo">
+          <img src="/icon.png" alt="" class="nav-logo-mark" />
+          Basis
+        </div>
+        <nav class="footer-links">
+          <a href="/learn">Learn</a>
+          <a href="/privacy">Privacy Policy</a>
+          <a href="/terms">Terms of Service</a>
+          <a href="/support">Support</a>
+        </nav>
+        <p class="footer-copy">&copy; 2026 Basis. All rights reserved.</p>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    const toggle = document.querySelector('.nav-toggle');
+    toggle.addEventListener('click', () => {
+      const open = document.body.classList.toggle('nav-open');
+      toggle.setAttribute('aria-expanded', open);
+    });
+    document.addEventListener('click', (e) => {
+      if (!e.target.closest('nav')) {
+        document.body.classList.remove('nav-open');
+        toggle.setAttribute('aria-expanded', false);
+      }
+    });
+  </script>
+
+  <script defer src="/_vercel/insights/script.js"></script>
+
+</body>
+</html>
