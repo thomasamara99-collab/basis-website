@@ -104,6 +104,31 @@ ul, ol { list-style: none; }
   .section { padding-block: var(--sp-32); }
 }
 
+/* The gallery strip and the section right after it share no visual
+   divider (no background tint, no border) — full padding-block on both
+   sides of that one boundary stacks into a dead gap with nothing to
+   justify it. Trim just that shared edge; every other section-to-section
+   boundary keeps its normal padding. */
+.gallery-section { padding-bottom: var(--sp-10); }
+.gallery-section + .section { padding-top: var(--sp-10); }
+
+@media (min-width: 768px) {
+  .gallery-section { padding-bottom: var(--sp-12); }
+  .gallery-section + .section { padding-top: var(--sp-12); }
+}
+
+/* Same issue either side of the stats bar: it's its own bordered panel
+   (see .stats-bar), but the plain sections touching it are transparent,
+   so their full padding-block reads as dead space rather than a
+   deliberate gap around the panel. */
+section:has(+ .stats-bar) { padding-bottom: var(--sp-10); }
+.stats-bar + section { padding-top: var(--sp-10); }
+
+@media (min-width: 768px) {
+  section:has(+ .stats-bar) { padding-bottom: var(--sp-12); }
+  .stats-bar + section { padding-top: var(--sp-12); }
+}
+
 /* ============================================================
    TYPOGRAPHY UTILITIES
    ============================================================ */
