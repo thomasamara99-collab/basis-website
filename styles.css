@@ -1714,6 +1714,26 @@ summary:hover { background: var(--surface-raised); }
   line-height: 1.35;
 }
 
+/* In-article FAQ */
+.article-faq {
+  margin-top: var(--sp-12);
+}
+
+.article-faq > h2 {
+  font-family: var(--font-display);
+  font-size: 25px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--text-primary);
+  line-height: 1.25;
+  margin-bottom: var(--sp-6);
+}
+
+.article-faq .faq-body {
+  font-size: 15px;
+  color: var(--text-secondary);
+}
+
 /* ============================================================
    REVIEWS
    ============================================================ */
