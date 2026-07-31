@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>The Option Greeks Explained: Delta, Gamma, Vega, Theta | Basis</title>
+  <meta name="description" content="Delta, gamma, vega and theta measure how an option’s price reacts to the market, time and volatility. Learn what each Greek means in plain English." />
+  <meta property="og:title" content="The Option Greeks Explained: Delta, Gamma, Vega, Theta | Basis" />
+  <meta property="og:description" content="Delta, gamma, vega and theta measure how an option’s price reacts to the market, time and volatility. Learn what each Greek means in plain English." />
+  <meta property="og:type" content="article" />
+  <meta property="og:url" content="https://www.basisfinance.app/learn/the-greeks-explained" />
+  <meta property="og:image" content="https://www.basisfinance.app/icon.png" />
+  <link rel="canonical" href="https://www.basisfinance.app/learn/the-greeks-explained" />
+  <link rel="icon" href="/favicon.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/styles.css" />
+
+  <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "headline": "The Greeks, explained",
+  "description": "Delta, gamma, vega and theta measure how an option’s price reacts to the market, time and volatility. Learn what each Greek means in plain English.",
+  "author": {
+    "@type": "Person",
+    "name": "Thomas Amara"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "Basis",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://www.basisfinance.app/icon.png"
+    }
+  },
+  "mainEntityOfPage": "https://www.basisfinance.app/learn/the-greeks-explained",
+  "image": "https://www.basisfinance.app/icon.png",
+  "inLanguage": "en"
+}
+  </script>
+
+  <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "What is delta in options?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Delta measures how much an option's price moves for a £1 move in the underlying stock. A 0.6 delta call gains about £0.60 for every £1 the stock rises. It also roughly approximates the probability the option finishes in the money — a 0.6 delta means about a 60% chance."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "What is theta (time decay)?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Theta is how much value an option loses per day, all else equal. Time is the option buyer's enemy: the option is worth a little less each day, and that decay accelerates in the final weeks before expiry."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "What does vega measure?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Vega measures how much an option's price changes when expected volatility changes by 1%. Higher volatility makes options more valuable, which is why they get expensive before earnings and lose value straight after — the \"volatility crush\"."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "What is the difference between long gamma and short gamma?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Being \"long gamma\" (an option buyer) means big moves in either direction work in your favour, but you pay time decay. Being \"short gamma\" (a seller) means you collect premium but big moves accelerate your losses. There's no free lunch between the two."
+      }
+    }
+  ]
+}
+  </script>
+</head>
+<body>
+
+  <nav class="nav">
+    <div class="container nav-inner">
+      <a href="/" class="nav-logo">
+        <img src="/icon.png" alt="" class="nav-logo-mark" />
+        Basis
+      </a>
+      <ul class="nav-links">
+        <li><a href="/learn">Learn</a></li>
+        <li><a href="/support">Support</a></li>
+        <li><a href="/privacy">Privacy</a></li>
+        <li><a href="/terms">Terms</a></li>
+      </ul>
+      <a href="https://apps.apple.com/app/basis-learn-finance-markets/id6784982377" class="btn btn-primary nav-cta">Download</a>
+      <button class="nav-toggle" aria-label="Toggle navigation" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </nav>
+
+  <article class="article">
+    <div class="container article-inner">
+      <div class="breadcrumb">
+        <a href="/learn">Learn</a>
+        <span class="sep">/</span>
+        <span>Derivatives</span>
+      </div>
+      <p class="article-eyebrow">Derivatives</p>
+      <h1 class="article-title">The Greeks, explained</h1>
+      <p class="article-lead">The "Greeks" measure how an option’s price reacts to the things that move it — the underlying price, the passage of time, and changes in volatility. They sound intimidating, but each one answers a simple, practical question.</p>
+      <p class="article-meta">6 min read</p>
+
+      <div class="prose">
+        <p>An <a href="/learn/call-and-put-options-explained">option's</a> price moves for several different reasons at once. The Greeks simply break that down, so a trader can measure and manage each source of risk separately. There are four you need to know.</p>
+
+        <h2>Delta: sensitivity to price</h2>
+        <p><strong>Delta</strong> answers: how much does the option's price move for a £1 move in the underlying stock? A call with a delta of 0.6 gains about £0.60 for every £1 the stock rises. Calls have deltas from 0 to +1; puts from −1 to 0. At-the-money options sit around 0.5. There's a neat bonus interpretation: delta also roughly approximates the probability the option finishes in the money — a 0.6 delta means about a 60% chance.</p>
+
+        <h2>Gamma: how fast delta changes</h2>
+        <p><strong>Gamma</strong> measures how much delta itself changes as the stock moves. High gamma means the option's sensitivity is unstable and shifts quickly — it's highest for at-the-money options near expiry. Option buyers are "long gamma": moves in their favour accelerate their gains. Sellers are "short gamma": moves against them accelerate their losses.</p>
+
+        <h2>Vega: sensitivity to volatility</h2>
+        <p><strong>Vega</strong> measures how much the option's price changes when expected <a href="/learn/risk-and-return">volatility</a> changes by 1%. Higher expected volatility makes options more valuable — there's more chance of a big move — so vega is positive for anyone holding options. This is why options get expensive before earnings (volatility expectations rise) and then lose value right after (the "volatility crush" as uncertainty resolves).</p>
+
+        <h2>Theta: the cost of time</h2>
+        <p><strong>Theta</strong> measures how much value an option loses each day, all else equal. Time is the option buyer's enemy: an option is worth less with each day that passes, and that decay <em>accelerates</em> in the final weeks before expiry. This is the fundamental trade-off in options — buyers get gamma (they benefit from big moves) but pay theta (time decay); sellers collect theta but are exposed to big moves. There's no free lunch.</p>
+
+        <div class="callout">
+          <p class="callout-label">Key takeaways</p>
+          <ul>
+            <li><strong>Delta</strong> — sensitivity to the underlying price (and a rough probability of finishing in the money).</li>
+            <li><strong>Gamma</strong> — how fast delta changes; highest at-the-money near expiry.</li>
+            <li><strong>Vega</strong> — sensitivity to volatility; why options get pricey before earnings.</li>
+            <li><strong>Theta</strong> — daily time decay, which accelerates toward expiry.</li>
+          </ul>
+        </div>
+      </div>
+
+      <section class="article-faq">
+        <h2>Common questions</h2>
+        <div class="faq">
+          <details>
+            <summary>What is delta in options?</summary>
+            <div class="faq-body">Delta measures how much an option's price moves for a £1 move in the underlying stock. A 0.6 delta call gains about £0.60 for every £1 the stock rises. It also roughly approximates the probability the option finishes in the money — a 0.6 delta means about a 60% chance.</div>
+          </details>
+          <details>
+            <summary>What is theta (time decay)?</summary>
+            <div class="faq-body">Theta is how much value an option loses per day, all else equal. Time is the option buyer's enemy: the option is worth a little less each day, and that decay accelerates in the final weeks before expiry.</div>
+          </details>
+          <details>
+            <summary>What does vega measure?</summary>
+            <div class="faq-body">Vega measures how much an option's price changes when expected volatility changes by 1%. Higher volatility makes options more valuable, which is why they get expensive before earnings and lose value straight after — the "volatility crush".</div>
+          </details>
+          <details>
+            <summary>What is the difference between long gamma and short gamma?</summary>
+            <div class="faq-body">Being "long gamma" (an option buyer) means big moves in either direction work in your favour, but you pay time decay. Being "short gamma" (a seller) means you collect premium but big moves accelerate your losses. There's no free lunch between the two.</div>
+          </details>
+        </div>
+      </section>
+
+      <div class="article-cta">
+        <h3>Learn this properly, in five minutes a day</h3>
+        <p>Basis turns concepts like this into short, interactive lessons — with quizzes, XP, and a daily market game built on real financial history.</p>
+        <a href="https://apps.apple.com/app/basis-learn-finance-markets/id6784982377" class="btn btn-primary btn-lg" target="_blank" rel="noopener">Get Basis free</a>
+      </div>
+    </div>
+
+    <div class="container">
+      <div class="related">
+        <p class="related-label">Keep learning</p>
+        <div class="related-list">
+        <a class="related-card" href="/learn/call-and-put-options-explained">
+          <span class="rc-tag">Derivatives</span>
+          <span class="rc-title">Call and put options, explained</span>
+        </a>
+        <a class="related-card" href="/learn/options-strategies-explained">
+          <span class="rc-tag">Derivatives</span>
+          <span class="rc-title">Options strategies explained</span>
+        </a>
+        <a class="related-card" href="/learn/risk-and-return">
+          <span class="rc-tag">Investing</span>
+          <span class="rc-title">Risk and return: the core trade-off</span>
+        </a>
+        </div>
+      </div>
+    </div>
+  </article>
+
+  <footer>
+    <div class="container">
+      <div class="footer-inner">
+        <div class="footer-logo">
+          <img src="/icon.png" alt="" class="nav-logo-mark" />
+          Basis
+        </div>
+        <nav class="footer-links">
+          <a href="/learn">Learn</a>
+          <a href="/privacy">Privacy Policy</a>
+          <a href="/terms">Terms of Service</a>
+          <a href="/support">Support</a>
+        </nav>
+        <p class="footer-copy">&copy; 2026 Basis. All rights reserved.</p>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    const toggle = document.querySelector('.nav-toggle');
+    toggle.addEventListener('click', () => {
+      const open = document.body.classList.toggle('nav-open');
+      toggle.setAttribute('aria-expanded', open);
+    });
+    document.addEventListener('click', (e) => {
+      if (!e.target.closest('nav')) {
+        document.body.classList.remove('nav-open');
+        toggle.setAttribute('aria-expanded', false);
+      }
+    });
+  </script>
+
+  <script defer src="/_vercel/insights/script.js"></script>
+
+</body>
+</html>

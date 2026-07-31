@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Options Strategies Explained: Covered Calls, Spreads, Straddles | Basis</title>
+  <meta name="description" content="Go beyond a single call or put. Learn the covered call, protective put, bull call spread and straddle — what each does, and when traders use them." />
+  <meta property="og:title" content="Options Strategies Explained: Covered Calls, Spreads, Straddles | Basis" />
+  <meta property="og:description" content="Go beyond a single call or put. Learn the covered call, protective put, bull call spread and straddle — what each does, and when traders use them." />
+  <meta property="og:type" content="article" />
+  <meta property="og:url" content="https://www.basisfinance.app/learn/options-strategies-explained" />
+  <meta property="og:image" content="https://www.basisfinance.app/icon.png" />
+  <link rel="canonical" href="https://www.basisfinance.app/learn/options-strategies-explained" />
+  <link rel="icon" href="/favicon.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/styles.css" />
+
+  <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "headline": "Options strategies explained",
+  "description": "Go beyond a single call or put. Learn the covered call, protective put, bull call spread and straddle — what each does, and when traders use them.",
+  "author": {
+    "@type": "Person",
+    "name": "Thomas Amara"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "Basis",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://www.basisfinance.app/icon.png"
+    }
+  },
+  "mainEntityOfPage": "https://www.basisfinance.app/learn/options-strategies-explained",
+  "image": "https://www.basisfinance.app/icon.png",
+  "inLanguage": "en"
+}
+  </script>
+
+  <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "What is a covered call in simple terms?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "You own a stock and sell a call option against it, pocketing the premium as income. If the stock stays flat or rises modestly you keep the premium; if it jumps above the strike, you have to sell at that strike and miss the gains above it. It's an income strategy that caps your upside."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "What is the difference between a straddle and a strangle?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Both bet on a big move in either direction. A straddle buys a call and a put at the same strike; a strangle uses different, out-of-the-money strikes, making it cheaper but requiring a larger move to profit. Both are ways to buy volatility around events like earnings."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "What is a protective put used for?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "It's portfolio insurance. You hold a stock and buy a put, which floors your downside at the strike price. If the stock crashes, the put pays out and limits your loss; if it rises, you keep the upside minus the premium. The put premium is simply the cost of the cover."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Why use a bull call spread instead of just buying a call?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "A spread is cheaper. By selling a higher-strike call against the one you buy, you offset some of the cost — in exchange for capping your profit at the higher strike. It's the standard way to take a moderately bullish view with clearly defined risk and reward."
+      }
+    }
+  ]
+}
+  </script>
+</head>
+<body>
+
+  <nav class="nav">
+    <div class="container nav-inner">
+      <a href="/" class="nav-logo">
+        <img src="/icon.png" alt="" class="nav-logo-mark" />
+        Basis
+      </a>
+      <ul class="nav-links">
+        <li><a href="/learn">Learn</a></li>
+        <li><a href="/support">Support</a></li>
+        <li><a href="/privacy">Privacy</a></li>
+        <li><a href="/terms">Terms</a></li>
+      </ul>
+      <a href="https://apps.apple.com/app/basis-learn-finance-markets/id6784982377" class="btn btn-primary nav-cta">Download</a>
+      <button class="nav-toggle" aria-label="Toggle navigation" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </nav>
+
+  <article class="article">
+    <div class="container article-inner">
+      <div class="breadcrumb">
+        <a href="/learn">Learn</a>
+        <span class="sep">/</span>
+        <span>Derivatives</span>
+      </div>
+      <p class="article-eyebrow">Derivatives</p>
+      <h1 class="article-title">Options strategies explained</h1>
+      <p class="article-lead">Buying a single call or put is the simplest option trade. But combine options together and you can express a precise view — on direction, on volatility, or on income — with a defined, known risk. Here are the strategies every derivatives desk uses.</p>
+      <p class="article-meta">6 min read</p>
+
+      <div class="prose">
+        <p>Once you understand a basic <a href="/learn/call-and-put-options-explained">call and put</a>, the real power of options comes from combining them. Each of the strategies below is just two or three simple options stacked together to shape a specific payoff — for income, for protection, or for a bet on how much (not which way) a price will move.</p>
+
+        <h2>The covered call: income from stock you own</h2>
+        <p>A <strong>covered call</strong> means holding a stock and selling a call option against it. You collect the premium from selling the call as income. The trade-off: if the stock rises above the strike, it gets "called away" — you're forced to sell at the strike and miss the gains above it. It's ideal when you own a stock, expect it to trade flat or drift mildly higher, and want to earn income in the meantime — accepting a cap on your upside in return.</p>
+
+        <h2>The protective put: insurance for your portfolio</h2>
+        <p>A <strong>protective put</strong> is the mirror image — you own a stock and buy a put to floor your downside. If the stock crashes, the put pays out and limits your loss; if it rises, you keep the upside, minus the premium you paid. It works exactly like insurance: the put premium is the cost of the cover. A higher strike gives more protection but costs more; a lower strike is cheaper but leaves you exposed to a bigger initial drop.</p>
+
+        <h2>The bull call spread: a cheaper directional bet</h2>
+        <p>A <strong>bull call spread</strong> combines buying a call at a lower strike and selling a call at a higher strike, same expiry. Selling the higher call helps pay for the one you bought, so the trade is cheaper — but your profit is capped at the higher strike. It's the standard way to take a moderately bullish view with a defined, limited risk: you know your maximum gain and maximum loss before you place it.</p>
+
+        <h2>Straddles and strangles: betting on a big move</h2>
+        <p>Sometimes you don't know <em>which</em> way a price will move, only that it will move a lot — around earnings, a <a href="/learn/what-do-central-banks-do">central bank</a> decision, or a big announcement. A <strong>straddle</strong> buys both a call and a put at the same strike, so it profits from a large move in <em>either</em> direction. You're buying volatility. The catch: the price has to move enough to cover both premiums, or the position loses. A <strong>strangle</strong> is a cheaper version using out-of-the-money strikes, but it needs an even bigger move to pay off.</p>
+
+        <div class="callout">
+          <p class="callout-label">Key takeaways</p>
+          <ul>
+            <li>A <strong>covered call</strong> earns income from stock you own, capping the upside.</li>
+            <li>A <strong>protective put</strong> is portfolio insurance — it floors your downside.</li>
+            <li>A <strong>bull call spread</strong> is a cheaper, risk-defined bullish bet.</li>
+            <li>A <strong>straddle</strong> profits from a big move in either direction — a bet on volatility.</li>
+          </ul>
+        </div>
+      </div>
+
+      <section class="article-faq">
+        <h2>Common questions</h2>
+        <div class="faq">
+          <details>
+            <summary>What is a covered call in simple terms?</summary>
+            <div class="faq-body">You own a stock and sell a call option against it, pocketing the premium as income. If the stock stays flat or rises modestly you keep the premium; if it jumps above the strike, you have to sell at that strike and miss the gains above it. It's an income strategy that caps your upside.</div>
+          </details>
+          <details>
+            <summary>What is the difference between a straddle and a strangle?</summary>
+            <div class="faq-body">Both bet on a big move in either direction. A straddle buys a call and a put at the <em>same</em> strike; a strangle uses different, out-of-the-money strikes, making it cheaper but requiring a larger move to profit. Both are ways to buy volatility around events like earnings.</div>
+          </details>
+          <details>
+            <summary>What is a protective put used for?</summary>
+            <div class="faq-body">It's portfolio insurance. You hold a stock and buy a put, which floors your downside at the strike price. If the stock crashes, the put pays out and limits your loss; if it rises, you keep the upside minus the premium. The put premium is simply the cost of the cover.</div>
+          </details>
+          <details>
+            <summary>Why use a bull call spread instead of just buying a call?</summary>
+            <div class="faq-body">A spread is cheaper. By selling a higher-strike call against the one you buy, you offset some of the cost — in exchange for capping your profit at the higher strike. It's the standard way to take a moderately bullish view with clearly defined risk and reward.</div>
+          </details>
+        </div>
+      </section>
+
+      <div class="article-cta">
+        <h3>Learn this properly, in five minutes a day</h3>
+        <p>Basis turns concepts like this into short, interactive lessons — with quizzes, XP, and a daily market game built on real financial history.</p>
+        <a href="https://apps.apple.com/app/basis-learn-finance-markets/id6784982377" class="btn btn-primary btn-lg" target="_blank" rel="noopener">Get Basis free</a>
+      </div>
+    </div>
+
+    <div class="container">
+      <div class="related">
+        <p class="related-label">Keep learning</p>
+        <div class="related-list">
+        <a class="related-card" href="/learn/call-and-put-options-explained">
+          <span class="rc-tag">Derivatives</span>
+          <span class="rc-title">Call and put options, explained</span>
+        </a>
+        <a class="related-card" href="/learn/the-greeks-explained">
+          <span class="rc-tag">Derivatives</span>
+          <span class="rc-title">The Greeks, explained</span>
+        </a>
+        <a class="related-card" href="/learn/what-are-futures">
+          <span class="rc-tag">Derivatives</span>
+          <span class="rc-title">What are futures contracts?</span>
+        </a>
+        </div>
+      </div>
+    </div>
+  </article>
+
+  <footer>
+    <div class="container">
+      <div class="footer-inner">
+        <div class="footer-logo">
+          <img src="/icon.png" alt="" class="nav-logo-mark" />
+          Basis
+        </div>
+        <nav class="footer-links">
+          <a href="/learn">Learn</a>
+          <a href="/privacy">Privacy Policy</a>
+          <a href="/terms">Terms of Service</a>
+          <a href="/support">Support</a>
+        </nav>
+        <p class="footer-copy">&copy; 2026 Basis. All rights reserved.</p>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    const toggle = document.querySelector('.nav-toggle');
+    toggle.addEventListener('click', () => {
+      const open = document.body.classList.toggle('nav-open');
+      toggle.setAttribute('aria-expanded', open);
+    });
+    document.addEventListener('click', (e) => {
+      if (!e.target.closest('nav')) {
+        document.body.classList.remove('nav-open');
+        toggle.setAttribute('aria-expanded', false);
+      }
+    });
+  </script>
+
+  <script defer src="/_vercel/insights/script.js"></script>
+
+</body>
+</html>
