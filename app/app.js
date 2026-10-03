@@ -1,204 +1,26 @@
 /* ============================================================
-   BASIS — web app (lessons, quizzes, progress, profile)
+   BASIS — web app shell (home, path, profile, router)
    ------------------------------------------------------------
    The curriculum is NOT authored here. src/data/curriculum/ in
    the app repo is the single source of truth;
    `npm run generate:web-curriculum` emits curriculum-index.js
-   and curriculum-lessons.js. Only the player lives in this file.
+   and curriculum-lessons.js.
 
-   Progress uses the SAME shapes and the SAME profiles row as the
-   iOS app (xp, streak, last_active_day, completed, scores), so a
-   signed-in learner's web and app progress are one record, merged
-   union-of-completed / max-of-xp exactly like SyncBridge does.
+   Shared state lives in core.js; the three big surfaces are
+   their own modules (onboarding.js, lesson.js, paywall.js).
    ============================================================ */
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
-import { diagram } from '/app/diagrams.js';
+import {
+  state, save, session, setSession, isPremium, supabase, render, go, esc,
+  setImmersive, syncNow, pushIdentity, consumeReturnHash, signOut, oauth,
+  APP_STORE, TRACKS, LEVELS, levelFor, trackStats, orderedTracks,
+  nextLessonOverall, xpToday, todayKey, mascot, countUp,
+} from '/app/core.js';
+import { viewOnboarding } from '/app/onboarding.js';
+import { viewLesson } from '/app/lesson.js';
 
-const SUPABASE_URL = 'https://qggmevyefongdmimwpzj.supabase.co';
-const SUPABASE_ANON_KEY =
-  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFnZ21ldnllZm9uZ2RtaW13cHpqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE3MjM3NDUsImV4cCI6MjA5NzI5OTc0NX0.8ZkEHoa5DxaDrMERfbKZkdHJSMx4Y1nlLz3hULuykB8';
+const DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 
-const APP_STORE = 'https://apps.apple.com/app/basis-learn-finance-markets/id6784982377';
-const STORE_KEY = 'basis-web-progress';
-const LESSONS_SRC = '/app/curriculum-lessons.js';
-
-const TRACKS = window.__BASIS_TRACKS__ || [];
-const LEVELS = window.__BASIS_LEVELS__ || [];
-
-const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
-  auth: { detectSessionInUrl: true, persistSession: true, flowType: 'pkce' },
-});
-
-const shell = document.getElementById('ba-shell');
-const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) =>
-  ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
-
-/** The app writes **bold** in lesson bodies; render it, escape everything else. */
-function rich(s) {
-  return esc(s).replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
-}
-
-function todayKey(d = new Date()) {
-  return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0')
-    + '-' + String(d.getDate()).padStart(2, '0');
-}
-
-function yesterdayKey() {
-  const d = new Date();
-  d.setDate(d.getDate() - 1);
-  return todayKey(d);
-}
-
-// ── Progress state ──────────────────────────────────────────
-// Field names deliberately mirror the app's ProgressSnapshot.
-const blank = () => ({
-  xp: 0,
-  streak: 0,
-  lastActiveDay: null,
-  completed: {},
-  scores: {},
-  topics: null,      // chosen in onboarding; null = not onboarded yet
-  onboarded: false,
-});
-
-let state = load();
-let session = null;
-let lessonsLoaded = false;
-let isPremium = false;   // mirrored from profiles.is_premium on sync
-
-function load() {
-  try {
-    const raw = localStorage.getItem(STORE_KEY);
-    if (raw) return Object.assign(blank(), JSON.parse(raw));
-  } catch { /* private mode */ }
-  return blank();
-}
-
-function save() {
-  try { localStorage.setItem(STORE_KEY, JSON.stringify(state)); } catch {}
-}
-
-/** Union completed, keep the best score, take the higher xp/streak — the same
- *  rule SyncBridge applies, so neither surface can clobber the other. */
-function merge(a, b) {
-  const completed = Object.assign({}, a.completed, b.completed);
-  const scores = Object.assign({}, a.scores);
-  for (const [k, v] of Object.entries(b.scores || {})) {
-    scores[k] = Math.max(scores[k] ?? 0, v);
-  }
-  return {
-    xp: Math.max(a.xp || 0, b.xp || 0),
-    streak: Math.max(a.streak || 0, b.streak || 0),
-    lastActiveDay: [a.lastActiveDay, b.lastActiveDay].filter(Boolean).sort().pop() ?? null,
-    completed,
-    scores,
-  };
-}
-
-async function pull() {
-  if (!session) return null;
-  const { data, error } = await supabase
-    .from('profiles')
-    .select('xp, streak, last_active_day, completed, scores, is_premium')
-    .eq('id', session.user.id)
-    .maybeSingle();
-  if (error || !data) return null;
-  // Subscribing happens in the app (billing lives with Apple); the web side
-  // only reads the resulting entitlement so a subscriber's Pro modules open
-  // here too.
-  isPremium = !!data.is_premium;
-  return {
-    xp: data.xp ?? 0,
-    streak: data.streak ?? 0,
-    lastActiveDay: data.last_active_day ?? null,
-    completed: data.completed ?? {},
-    scores: data.scores ?? {},
-  };
-}
-
-async function push() {
-  if (!session) return;
-  await supabase.from('profiles').upsert({
-    id: session.user.id,
-    xp: state.xp,
-    streak: state.streak,
-    last_active_day: state.lastActiveDay,
-    completed: state.completed,
-    scores: state.scores,
-    updated_at: new Date().toISOString(),
-  }, { onConflict: 'id' });
-}
-
-async function syncNow() {
-  const remote = await pull();
-  if (remote) {
-    const merged = merge(state, remote);
-    Object.assign(state, merged);
-    save();
-  }
-  await push();
-}
-
-/** Streak advances once per calendar day, resets if a day was missed. */
-function touchStreak() {
-  const t = todayKey();
-  if (state.lastActiveDay === t) return;
-  state.streak = state.lastActiveDay === yesterdayKey() ? (state.streak || 0) + 1 : 1;
-  state.lastActiveDay = t;
-}
-
-// ── Derived helpers ─────────────────────────────────────────
-const allLessons = () => TRACKS.flatMap((t) =>
-  t.modules.flatMap((m) => m.lessons.map((l) => ({ ...l, track: t, module: m }))));
-
-function levelFor(xp) {
-  let current = LEVELS[0], next = null;
-  for (let i = 0; i < LEVELS.length; i++) {
-    if (xp >= LEVELS[i].minXp) { current = LEVELS[i]; next = LEVELS[i + 1] || null; }
-  }
-  return { current, next };
-}
-
-function trackStats(t) {
-  let done = 0, total = 0;
-  t.modules.forEach((m) => m.lessons.forEach((l) => {
-    if (l.soon) return;
-    total++;
-    if (state.completed[l.id]) done++;
-  }));
-  return { done, total };
-}
-
-/** Tracks the learner picked in onboarding come first; the rest keep their
- *  authored order. This IS the "custom lesson plan". */
-function orderedTracks() {
-  if (!state.topics || !state.topics.length) return TRACKS;
-  const picked = new Set(state.topics);
-  return [...TRACKS].sort((a, b) => (picked.has(b.id) ? 1 : 0) - (picked.has(a.id) ? 1 : 0));
-}
-
-function nextLessonIn(t) {
-  for (const m of t.modules) {
-    for (const l of m.lessons) {
-      if (!l.soon && !state.completed[l.id]) return { lesson: l, module: m };
-    }
-  }
-  return null;
-}
-
-async function ensureLessons() {
-  if (lessonsLoaded || window.__BASIS_LESSONS__) { lessonsLoaded = true; return; }
-  await new Promise((resolve, reject) => {
-    const s = document.createElement('script');
-    s.src = LESSONS_SRC;
-    s.onload = resolve;
-    s.onerror = reject;
-    document.head.appendChild(s);
-  });
-  lessonsLoaded = true;
-}
-
-// ── Chrome ──────────────────────────────────────────────────
+// ── Shared chrome ───────────────────────────────────────────
 function header() {
   const { current, next } = levelFor(state.xp);
   const pct = next
@@ -218,110 +40,124 @@ function header() {
     </div>`;
 }
 
-function render(html) {
-  shell.innerHTML = html;
-  window.scrollTo({ top: 0, behavior: 'auto' });
+function footerCta() {
+  return `
+    <div class="ba-appcta">
+      <p>Reminders, the daily market game and the full leaderboards live in the app.</p>
+      <a class="ba-btn ba-btn-go" href="${APP_STORE}">Get Basis free</a>
+    </div>`;
 }
 
-// ── Views ───────────────────────────────────────────────────
-function viewOnboarding() {
-  render(`
-    <div class="ba-card ba-onboard">
-      <p class="ba-eyebrow">Welcome</p>
-      <h1 class="ba-h1">What do you want to learn?</h1>
-      <p class="ba-sub">Pick anything that interests you and we'll put those tracks first.
-        Skip it and you'll get the default order — you can change your mind later.</p>
-      <div class="ba-topics">
-        ${TRACKS.map((t) => `
-          <button class="ba-topic" data-id="${esc(t.id)}" style="--tc:${esc(t.color)}">
-            <span class="ba-topic-dot"></span>${esc(t.title)}
-          </button>`).join('')}
+/** The daily goal ring — the app's "Today" centrepiece. */
+function goalRing() {
+  const goal = state.dailyGoal || 20;
+  const done = xpToday();
+  const pct = Math.min(1, done / goal);
+  const R = 34, C = 2 * Math.PI * R;
+  const left = Math.max(0, goal - done);
+  return `
+    <div class="ba-goal">
+      <div class="ba-goal-dial">
+        <svg viewBox="0 0 80 80" class="ba-goal-ring" aria-hidden="true">
+          <circle cx="40" cy="40" r="${R}" class="ba-goal-bg" />
+          <circle cx="40" cy="40" r="${R}" class="ba-goal-fg"
+            stroke-dasharray="${C.toFixed(1)}" stroke-dashoffset="${(C * (1 - pct)).toFixed(1)}" />
+        </svg>
+        <div class="ba-goal-text"><strong>${done}</strong><span>/${goal}</span></div>
       </div>
-      <button class="ba-btn ba-btn-primary" id="ba-onb-go">Start learning</button>
-      <button class="ba-btn ba-btn-ghost" id="ba-onb-skip">Skip</button>
-    </div>`);
-
-  const picked = new Set();
-  shell.querySelectorAll('.ba-topic').forEach((b) => {
-    b.addEventListener('click', () => {
-      const id = b.dataset.id;
-      if (picked.has(id)) { picked.delete(id); b.classList.remove('on'); }
-      else { picked.add(id); b.classList.add('on'); }
-    });
-  });
-  const finish = () => {
-    state.topics = [...picked];
-    state.onboarded = true;
-    save();
-    go('#/');
-  };
-  shell.querySelector('#ba-onb-go').addEventListener('click', finish);
-  shell.querySelector('#ba-onb-skip').addEventListener('click', finish);
+      <div class="ba-goal-copy">
+        <p class="ba-goal-title">${pct >= 1 ? 'Daily goal hit 🎉' : 'Today’s goal'}</p>
+        <p class="ba-sub">${pct >= 1
+          ? 'Anything else today is a bonus.'
+          : `${left} XP to go — about ${Math.max(1, Math.ceil(left / 10))} question${left > 10 ? 's' : ''}.`}</p>
+      </div>
+    </div>`;
 }
 
-function viewHome() {
-  const tracks = orderedTracks();
-  const first = tracks.find((t) => nextLessonIn(t));
-  const cont = first ? nextLessonIn(first) : null;
+/** Mon–Sun strip showing which days this week were active. */
+function streakWeek() {
+  const now = new Date();
+  const dow = (now.getDay() + 6) % 7; // Monday = 0
+  const cells = DAYS.map((d, i) => {
+    const day = new Date(now);
+    day.setDate(now.getDate() - (dow - i));
+    const key = todayKey(day);
+    const future = i > dow;
+    const active = !future
+      && (((state.dayXp || {})[key] || 0) > 0 || state.lastActiveDay === key);
+    return `<div class="ba-week-cell ${active ? 'on' : ''} ${i === dow ? 'today' : ''} ${future ? 'future' : ''}">
+        <span>${d[0]}</span><i>${active ? '🔥' : ''}</i></div>`;
+  }).join('');
+  return `<div class="ba-week">${cells}</div>`;
+}
 
+// ── Home ────────────────────────────────────────────────────
+function viewHome() {
+  setImmersive(false);
+  const up = nextLessonOverall();
+  const started = Object.keys(state.completed || {}).length > 0;
   render(`
     ${header()}
-    ${cont ? `
-      <a class="ba-continue" href="#/lesson/${esc(cont.lesson.id)}">
-        <div>
-          <p class="ba-eyebrow">Continue</p>
-          <p class="ba-continue-title">${esc(cont.lesson.title)}</p>
-          <p class="ba-continue-sub">${esc(first.title)} · +${cont.lesson.xp} XP</p>
-        </div>
-        <span class="ba-continue-arrow">→</span>
+    <div class="ba-card">${goalRing()}${streakWeek()}</div>
+
+    ${up ? `
+      <a class="ba-continue" href="#/lesson/${esc(up.lesson.id)}" style="--tc:${esc(up.track.color)}">
+        <span class="ba-continue-k">${started ? 'Continue' : 'Start here'}</span>
+        <strong>${esc(up.lesson.title)}</strong>
+        <em>${esc(up.track.title)} · ${esc(up.module.title)} · +${up.lesson.xp} XP</em>
       </a>` : `
-      <div class="ba-card"><p class="ba-sub">You've completed every lesson available. More coming.</p></div>`}
+      <div class="ba-card"><p class="ba-sub">You’ve finished every playable lesson. New
+        content ships regularly — and The Floor resets daily.</p>
+        <a class="ba-btn ba-btn-primary" href="/floor">Play today’s Floor</a></div>`}
 
     <h2 class="ba-section-title">Your path</h2>
-    <div class="ba-tracks">
-      ${tracks.map((t) => {
-        const { done, total } = trackStats(t);
-        const pct = total ? (done / total) * 100 : 0;
-        const starred = state.topics && state.topics.includes(t.id);
-        return `
-          <a class="ba-track" href="#/track/${esc(t.id)}" style="--tc:${esc(t.color)}">
-            <div class="ba-track-top">
-              <span class="ba-track-dot"></span>
-              <span class="ba-track-name">${esc(t.title)}</span>
-              ${starred ? '<span class="ba-pick">picked</span>' : ''}
-              <span class="ba-track-count">${done}/${total}</span>
-            </div>
-            <div class="ba-bar sm"><div class="ba-bar-fill" style="width:${pct}%"></div></div>
-          </a>`;
-      }).join('')}
-    </div>
+    ${orderedTracks().map((t) => {
+      const { done, total } = trackStats(t);
+      const pct = total ? Math.round((done / total) * 100) : 0;
+      const picked = (state.topics || []).includes(t.id);
+      return `
+        <a class="ba-track" href="#/track/${esc(t.id)}" style="--tc:${esc(t.color)}">
+          <div class="ba-track-top">
+            <span class="ba-track-title">${esc(t.title)}</span>
+            ${picked ? '<span class="ba-track-pick">For you</span>' : ''}
+            <span class="ba-track-count">${done}/${total}</span>
+          </div>
+          <div class="ba-bar sm"><div class="ba-bar-fill" style="width:${pct}%"></div></div>
+        </a>`;
+    }).join('')}
     ${footerCta()}`);
 }
 
+// ── Track ───────────────────────────────────────────────────
 function viewTrack(id) {
+  setImmersive(false);
   const t = TRACKS.find((x) => x.id === id);
   if (!t) return go('#/');
+  const { done, total } = trackStats(t);
   render(`
-    ${header()}
     <a class="ba-back" href="#/">← Your path</a>
-    <h1 class="ba-h1" style="--tc:${esc(t.color)}">${esc(t.title)}</h1>
-    ${t.description ? `<p class="ba-sub">${esc(t.description)}</p>` : ''}
+    <div class="ba-card" style="--tc:${esc(t.color)}">
+      <p class="ba-eyebrow">${done}/${total} complete</p>
+      <h1 class="ba-h1">${esc(t.title)}</h1>
+      <p class="ba-sub">${esc(t.description)}</p>
+    </div>
     ${t.modules.map((m) => `
       <div class="ba-module">
         <div class="ba-module-head">
-          <h3>${esc(m.title)}</h3>
-          ${m.premium ? '<span class="ba-lock">Pro</span>' : ''}
+          <h2 class="ba-module-title">${esc(m.title)}</h2>
+          ${m.premium ? '<span class="ba-pro-tag">Pro</span>' : ''}
         </div>
+        ${m.description ? `<p class="ba-sub">${esc(m.description)}</p>` : ''}
         ${m.lessons.map((l) => {
-          const done = !!state.completed[l.id];
+          const complete = !!state.completed[l.id];
           // Premium rows stay tappable — they lead to the paywall, or straight
           // into the lesson for a subscriber. Only unauthored ones are inert.
           const pro = m.premium && !isPremium;
-          const cls = 'ba-lesson' + (done ? ' done' : '')
+          const cls = 'ba-lesson' + (complete ? ' done' : '')
             + (l.soon ? ' locked' : '') + (pro ? ' pro' : '');
-          const badge = l.soon ? 'Soon' : (m.premium && !isPremium ? 'Pro' : '+' + l.xp + ' XP');
+          const badge = l.soon ? 'Soon' : (pro ? 'Pro' : '+' + l.xp + ' XP');
           const inner = `
-            <span class="ba-lesson-mark">${done ? '✓' : (l.soon ? '🔒' : (pro ? '★' : ''))}</span>
+            <span class="ba-lesson-mark">${complete ? '✓' : (l.soon ? '🔒' : (pro ? '★' : ''))}</span>
             <span class="ba-lesson-title">${esc(l.title)}</span>
             <span class="ba-lesson-xp">${badge}</span>`;
           return l.soon
@@ -332,320 +168,84 @@ function viewTrack(id) {
     ${footerCta()}`);
 }
 
-function footerCta() {
-  return `
-    <div class="ba-appcta">
-      <p>Streaks, reminders, the daily market game and the leaderboard live in the app.</p>
-      <a class="ba-btn ba-btn-go" href="${APP_STORE}">Get Basis free</a>
-    </div>`;
-}
-
-// ── Lesson player ───────────────────────────────────────────
-async function viewLesson(id) {
-  render('<div class="ba-loading">Loading lesson…</div>');
-  try {
-    await ensureLessons();
-  } catch {
-    return render('<div class="ba-card"><p class="ba-sub">Couldn\'t load the lesson. Check your connection and try again.</p></div>');
-  }
-  let L = (window.__BASIS_LESSONS__ || {})[id];
-  if (!L) return go('#/');
-
-  // Premium bodies aren't in the bundle — fetch them, gated, for subscribers.
-  if (L.locked) {
-    if (!session || !isPremium) return viewPaywall(L);
-    render('<div class="ba-loading">Unlocking lesson…</div>');
-    const { data, error } = await supabase.rpc('get_premium_lesson', { p_id: id });
-    if (error || !data) return viewPaywall(L, error ? error.message : null);
-    L = data;
-  }
-
-  // phase: teaching sections first, then one question at a time — the app's
-  // rule is that the material must cover everything the quiz tests.
-  let step = 0;
-  const sections = L.sections || [];
-  const total = sections.length + L.questions.length;
-  let qIndex = 0;
-  let correctCount = 0;
-
-  function chrome(inner, progressAt) {
-    return `
-      <div class="ba-lesson-top">
-        <a class="ba-close" href="#/track/${esc(L.trackId)}" aria-label="Close lesson">✕</a>
-        <div class="ba-bar sm wide"><div class="ba-bar-fill" style="width:${(progressAt / total) * 100}%"></div></div>
-        <span class="ba-lesson-count">${Math.min(progressAt + 1, total)}/${total}</span>
-      </div>
-      <div class="ba-card" style="--tc:${esc(L.color)}">${inner}</div>`;
-  }
-
-  function showSection() {
-    const s = sections[step];
-    render(chrome(`
-      <p class="ba-eyebrow">${esc(L.trackTitle)}</p>
-      ${step === 0 ? `<h1 class="ba-h1">${esc(L.title)}</h1><p class="ba-lead">${rich(L.intro)}</p>` : ''}
-      ${s.heading ? `<h2 class="ba-h2">${esc(s.heading)}</h2>` : ''}
-      ${s.visual ? diagram(s.visual, L.color) : ''}
-      <p class="ba-body">${rich(s.body)}</p>
-      ${s.formula ? `<div class="ba-formula">${esc(s.formula)}</div>` : ''}
-      ${s.bullets && s.bullets.length
-        ? `<ul class="ba-bullets">${s.bullets.map((b) => `<li>${rich(b)}</li>`).join('')}</ul>`
-        : ''}
-      <button class="ba-btn ba-btn-primary" id="ba-next">
-        ${step === sections.length - 1 ? 'Start questions' : 'Continue'}
-      </button>`, step));
-    shell.querySelector('#ba-next').addEventListener('click', () => { step++; advance(); });
-  }
-
-  function showQuestion() {
-    const q = L.questions[qIndex];
-    let chosen = null;
-    render(chrome(`
-      <p class="ba-eyebrow">Quick check</p>
-      <h2 class="ba-h2">${rich(q.prompt)}</h2>
-      <div class="ba-options" id="ba-opts">
-        ${q.options.map((o, i) => `
-          <button class="ba-opt" data-i="${i}">
-            <span class="ba-opt-key">${'ABCD'[i]}</span><span>${esc(o)}</span>
-          </button>`).join('')}
-      </div>
-      <button class="ba-btn ba-btn-primary" id="ba-check" disabled>Check answer</button>`, step));
-
-    const check = shell.querySelector('#ba-check');
-    shell.querySelectorAll('.ba-opt').forEach((b) => {
-      b.addEventListener('click', () => {
-        chosen = +b.dataset.i;
-        shell.querySelectorAll('.ba-opt').forEach((x) => x.classList.toggle('sel', x === b));
-        check.disabled = false;
-      });
-    });
-    check.addEventListener('click', () => {
-      if (chosen === null) return;
-      const right = chosen === q.correctIndex;
-      if (right) correctCount++;
-      shell.querySelectorAll('.ba-opt').forEach((x, i) => {
-        x.disabled = true;
-        if (i === q.correctIndex) x.classList.add('right');
-        else if (i === chosen) x.classList.add('wrong');
-      });
-      check.outerHTML = `
-        <div class="ba-explain ${right ? 'right' : 'wrong'}">
-          <p class="ba-explain-head">${right ? '✓ Correct' : 'Not quite'}</p>
-          <p>${rich(q.explanation)}</p>
-        </div>
-        <button class="ba-btn ba-btn-go" id="ba-next">
-          ${qIndex === L.questions.length - 1 ? 'Finish lesson' : 'Next question'}
-        </button>`;
-      shell.querySelector('#ba-next').addEventListener('click', () => {
-        qIndex++; step++; advance();
-      });
-    });
-  }
-
-  async function finish() {
-    const firstTime = !state.completed[L.id];
-    const score = Math.round((correctCount / L.questions.length) * 100);
-    state.completed[L.id] = true;
-    state.scores[L.id] = Math.max(state.scores[L.id] ?? 0, score);
-    if (firstTime) state.xp += L.xp;   // XP is awarded once, as in the app
-    touchStreak();
-    save();
-
-    render(`
-      <div class="ba-card ba-done">
-        <p class="ba-done-mark">✓</p>
-        <h1 class="ba-h1">${firstTime ? 'Lesson complete' : 'Reviewed'}</h1>
-        <p class="ba-sub">${correctCount}/${L.questions.length} correct${firstTime ? ` · +${L.xp} XP` : ' · already earned'}</p>
-        <div class="ba-done-actions">
-          <a class="ba-btn ba-btn-primary" href="#/track/${esc(L.trackId)}">Back to ${esc(L.trackTitle)}</a>
-          <a class="ba-btn ba-btn-ghost" href="#/">Your path</a>
-        </div>
-        <div id="ba-save"></div>
-      </div>`);
-
-    renderSavePrompt();
-    if (session) { try { await syncNow(); } catch {} }
-  }
-
-  function advance() {
-    if (step < sections.length) return showSection();
-    if (qIndex < L.questions.length) return showQuestion();
-    finish();
-  }
-
-  advance();
-}
-
-// ── Paywall ─────────────────────────────────────────────────
-/** Read from the shipped index rather than restated in prose: a hand-written
- *  perk list drifts the moment the Career Accelerator changes, and a paywall
- *  that promises a lesson that isn't there is the worst kind of stale copy. */
-function premiumModules() {
-  const out = [];
-  for (const t of (window.__BASIS_TRACKS__ || [])) {
-    for (const m of t.modules) if (m.premium) out.push(m);
-  }
-  return out;
-}
-
-function premiumLessonCount() {
-  return premiumModules().reduce((n, m) => n + m.lessons.length, 0);
-}
-
-/** Shown instead of a premium lesson. Deliberately does not pretend to sell:
- *  there is no web checkout yet, so the honest flow is "subscribe in the app,
- *  then sign in here and it opens". */
-function viewPaywall(L, failure) {
-  render(`
-    ${header()}
-    <a class="ba-back" href="#/track/${esc(L.trackId)}">← ${esc(L.trackTitle)}</a>
-    <div class="ba-card ba-paywall">
-      <p class="ba-eyebrow gold">Career Accelerator</p>
-      <h1 class="ba-h1">${esc(L.title)}</h1>
-      <p class="ba-sub">${esc(L.intro)}</p>
-
-      ${premiumModules().map((m) => `
-        <p class="ba-perk-head">${esc(m.title)}</p>
-        <ul class="ba-perks">${m.lessons.map((l) => `<li>${esc(l.title)}</li>`).join('')}</ul>`).join('')}
-      <p class="ba-pro-count">${premiumLessonCount()} Career Accelerator lessons · one subscription, app and web</p>
-
-      <div class="ba-prices">
-        <div class="ba-price"><span>Monthly</span><strong>£7.99</strong><em>per month</em></div>
-        <div class="ba-price best"><span>Annual</span><strong>£49.99</strong><em>£4.17/mo · save 48%</em></div>
-      </div>
-
-      ${failure ? `<p class="ba-paywall-err">${esc(failure)}</p>` : ''}
-
-      <a class="ba-btn ba-btn-gold" href="${APP_STORE}">Subscribe in the app</a>
-      <p class="ba-fineprint">Billed through your Apple ID; cancel anytime in Settings.
-        Prices shown in GBP — your App Store charges in your own currency.
-        Subscriptions are handled in the app: sign in here with the same account
-        and your Pro lessons unlock on the web too.</p>
-
-      ${session
-        ? `<p class="ba-fineprint">Signed in as ${esc(session.user.email || 'your account')}${
-            isPremium ? '.' : ' — no active subscription found on this account.'}</p>`
-        : `<div id="ba-unlock"></div>`}
-    </div>`);
-
-  if (!session) renderUnlockPrompt();
-}
-
-/** The paywall's own sign-in box: someone here may already be paying in the
- *  app, in which case the honest CTA is "sign in", not "subscribe". */
-function renderUnlockPrompt() {
-  const el = document.getElementById('ba-unlock');
-  if (!el) return;
-  el.innerHTML = `
-    <div class="ba-savebox">
-      <p class="ba-savebox-title">Already subscribed?</p>
-      <p class="ba-sub">Sign in with the account you use in the app and this lesson opens right here.</p>
-      <button class="ba-btn ba-btn-oauth" data-p="google">Continue with Google</button>
-      <button class="ba-btn ba-btn-oauth" data-p="apple">Continue with Apple</button>
-    </div>`;
-  el.querySelectorAll('[data-p]').forEach((b) =>
-    b.addEventListener('click', () => oauth(b.dataset.p)));
-}
-
-// ── Account ─────────────────────────────────────────────────
-function renderSavePrompt() {
-  const el = document.getElementById('ba-save');
-  if (!el) return;
-  if (session) {
-    el.innerHTML = `<p class="ba-saved">✓ Saved to your account — it's on your phone too.</p>`;
-    return;
-  }
-  el.innerHTML = `
-    <div class="ba-savebox">
-      <p class="ba-savebox-title">Don't lose this</p>
-      <p class="ba-sub">Sign in free and your XP, streak and progress follow you to the app.</p>
-      <button class="ba-btn ba-btn-oauth" data-p="google">Continue with Google</button>
-      <button class="ba-btn ba-btn-oauth" data-p="apple">Continue with Apple</button>
-    </div>`;
-  el.querySelectorAll('[data-p]').forEach((b) =>
-    b.addEventListener('click', () => oauth(b.dataset.p)));
-}
-
-const RETURN_KEY = 'basis.app.return';
-
-async function oauth(provider) {
-  // The route hash deliberately does NOT go into redirectTo: Supabase matches
-  // the whole redirect URL against its allowlist, so every lesson route would
-  // need allowlisting, and the ?code= it appends sits awkwardly beside an
-  // existing fragment. Stash the route here and restore it on the way back —
-  // only /app has to be allowlisted.
-  try { sessionStorage.setItem(RETURN_KEY, window.location.hash || ''); } catch {}
-  await supabase.auth.signInWithOAuth({
-    provider,
-    options: { redirectTo: window.location.origin + '/app' },
-  });
-}
-
-function consumeReturnHash() {
-  let h = '';
-  try {
-    h = sessionStorage.getItem(RETURN_KEY) || '';
-    sessionStorage.removeItem(RETURN_KEY);
-  } catch { /* private mode — they just land on the path screen */ }
-  return h;
-}
-
+// ── Profile ─────────────────────────────────────────────────
 function viewProfile() {
+  setImmersive(false);
   const { current, next } = levelFor(state.xp);
-  const done = Object.keys(state.completed).length;
-  const totalLessons = allLessons().filter((l) => !l.soon).length;
+  const lessonsDone = Object.keys(state.completed || {}).length;
+  const scores = Object.values(state.scores || {});
+  const avg = scores.length ? Math.round(scores.reduce((a, b) => a + b, 0) / scores.length) : 0;
+
   render(`
-    ${header()}
     <a class="ba-back" href="#/">← Your path</a>
-    <div class="ba-card">
-      <h1 class="ba-h1">${esc(current.title)}</h1>
-      <p class="ba-sub">${esc(current.blurb || '')}</p>
-      <div class="ba-stats">
-        <div><strong>${state.xp.toLocaleString()}</strong><span>Total XP</span></div>
-        <div><strong>${state.streak}</strong><span>Day streak</span></div>
-        <div><strong>${done}/${totalLessons}</strong><span>Lessons</span></div>
+    <div class="ba-card ba-identity">
+      ${mascot('happy', 64)}
+      <div>
+        <h1 class="ba-h1 sm">${esc(state.username || 'Your profile')}</h1>
+        <p class="ba-sub">${esc(current.title)} · ${state.xp.toLocaleString()} XP${isPremium ? ' · Pro' : ''}</p>
       </div>
-      ${next ? `<p class="ba-sub">${(next.minXp - state.xp).toLocaleString()} XP to ${esc(next.title)}.</p>` : '<p class="ba-sub">Top of the ladder.</p>'}
+    </div>
+
+    <div class="ba-done-stats">
+      <div class="ba-stat"><span class="ba-stat-v" id="s1">0</span><span class="ba-stat-l">Lessons</span></div>
+      <div class="ba-stat"><span class="ba-stat-v" id="s2">0</span><span class="ba-stat-l">Day streak</span></div>
+      <div class="ba-stat"><span class="ba-stat-v" id="s3">0</span><span class="ba-stat-l">Avg score</span></div>
     </div>
 
     <div class="ba-card">
       <h2 class="ba-h2">Career ladder</h2>
-      ${LEVELS.map((l) => `
-        <div class="ba-rung ${state.xp >= l.minXp ? 'on' : ''}">
-          <span>${esc(l.title)}</span><span>${l.minXp.toLocaleString()} XP</span>
+      ${LEVELS.map((lv) => `
+        <div class="ba-ladder ${lv.id === current.id ? 'on' : ''} ${state.xp >= lv.minXp ? 'got' : ''}">
+          <span>${esc(lv.title)}</span>
+          <span class="ba-ladder-xp">${lv.minXp.toLocaleString()} XP</span>
         </div>`).join('')}
+      ${next ? `<p class="ba-sub" style="margin-top:12px">${(next.minXp - state.xp).toLocaleString()} XP to ${esc(next.title)}</p>` : ''}
+    </div>
+
+    <div class="ba-card">
+      <h2 class="ba-h2">Daily goal</h2>
+      <div class="ba-goalpick">
+        ${[10, 20, 30].map((g) => `
+          <button class="ba-goalopt ${state.dailyGoal === g ? 'on' : ''}" data-g="${g}">${g} XP</button>`).join('')}
+      </div>
     </div>
 
     <div class="ba-card">
       <h2 class="ba-h2">Account</h2>
-      <div id="ba-save"></div>
-      ${session ? `<button class="ba-btn ba-btn-ghost" id="ba-signout">Sign out</button>` : ''}
-      <button class="ba-btn ba-btn-ghost" id="ba-redo">Redo onboarding</button>
+      <p class="ba-sub">${session ? esc(session.user.email || 'Signed in') : 'Not signed in'}</p>
+      ${session
+        ? `<button class="ba-btn ba-btn-ghost" id="out">Sign out</button>`
+        : `<button class="ba-btn ba-btn-oauth" data-p="google">Continue with Google</button>
+           <button class="ba-btn ba-btn-oauth" data-p="apple">Continue with Apple</button>`}
     </div>
     ${footerCta()}`);
 
-  renderSavePrompt();
-  const out = shell.querySelector('#ba-signout');
-  if (out) out.addEventListener('click', async () => {
-    await supabase.auth.signOut();
-    go('#/profile');
-  });
-  shell.querySelector('#ba-redo').addEventListener('click', () => {
-    state.onboarded = false;
-    save();
-    go('#/onboarding');
-  });
+  countUp(document.getElementById('s1'), lessonsDone, 700);
+  countUp(document.getElementById('s2'), state.streak, 700);
+  countUp(document.getElementById('s3'), avg, 700, (v) => Math.round(v) + '%');
+
+  document.querySelectorAll('.ba-goalopt').forEach((b) =>
+    b.addEventListener('click', () => {
+      state.dailyGoal = Number(b.dataset.g);
+      save();
+      viewProfile();
+    }));
+  const out = document.getElementById('out');
+  if (out) out.addEventListener('click', async () => { await signOut(); go('#/'); });
+  document.querySelectorAll('[data-p]').forEach((b) =>
+    b.addEventListener('click', () => oauth(b.dataset.p).catch(() => {})));
 }
 
 // ── Router ──────────────────────────────────────────────────
-function go(hash) {
-  if (window.location.hash === hash) route();
-  else window.location.hash = hash;
-}
-
 function route() {
   const h = window.location.hash || '#/';
-  if (!state.onboarded && h !== '#/onboarding') return go('#/onboarding');
-  if (h === '#/onboarding') return viewOnboarding();
+
+  // Onboarding ends in an account, and the account is not optional: a browser
+  // profile is far more disposable than a phone, so an unsigned learner would
+  // lose their streak the first time they cleared site data.
+  if (!state.onboarded) return viewOnboarding(false);
+  if (!session) return viewOnboarding(true);
+
   if (h === '#/profile') return viewProfile();
   const track = h.match(/^#\/track\/(.+)$/);
   if (track) return viewTrack(track[1]);
@@ -658,14 +258,19 @@ window.addEventListener('hashchange', route);
 
 supabase.auth.onAuthStateChange(async (_e, s) => {
   const had = !!session;
-  session = s;
-  if (!had && s) { try { await syncNow(); } catch {} route(); }
+  setSession(s);
+  if (!had && s) {
+    try { await syncNow(); await pushIdentity(); } catch {}
+    route();
+  }
 });
 
 (async function start() {
   const { data } = await supabase.auth.getSession();
-  session = data.session;
-  if (session) { try { await syncNow(); } catch {} }
+  setSession(data.session);
+  if (data.session) {
+    try { await syncNow(); await pushIdentity(); } catch {}
+  }
   const back = consumeReturnHash();
   if (back && back !== (window.location.hash || '')) {
     window.location.hash = back; // fires hashchange -> route()
