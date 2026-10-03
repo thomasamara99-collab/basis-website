@@ -64,6 +64,93 @@
     return Math.round(stake * mult);
   }
 
+  // ── Reveal animation (ported from src/features/floor/RevealChart.tsx) ──
+  var CHART_MS = 1600;
+  var CHART_H = 130;
+  var BREAK_AT = 0.62;   // where the random walk ends and the outcome begins
+  var COUNT_MS = 700;    // CountUpMoney duration
+
+  var reduceMotion = window.matchMedia
+    && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  function hashSeed(seed) {
+    var h = 5381;
+    for (var i = 0; i < seed.length; i++) h = ((h << 5) + h + seed.charCodeAt(i)) >>> 0;
+    return h || 1;
+  }
+
+  function mulberry32(seed) {
+    var a = seed >>> 0;
+    return function () {
+      a = (a + 0x6d2b79f5) >>> 0;
+      var t = a;
+      t = Math.imul(t ^ (t >>> 15), t | 1);
+      t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    };
+  }
+
+  /** Same geometry as the app: a neutral walk that breaks hard into the
+   *  outcome, so the shape itself gives the result away a beat before the
+   *  words do. Seeded, so a resumed reveal redraws identically. */
+  function buildChart(seed, outcome) {
+    var rand = mulberry32(hashSeed(seed + ':' + outcome));
+    var N = 36;
+    var split = Math.floor(N * BREAK_AT);
+    var start = 0.42 + rand() * 0.16;
+    var ys = [start];
+    for (var i = 1; i < N; i++) {
+      var prev = ys[i - 1];
+      var next;
+      if (i < split) {
+        next = Math.min(0.72, Math.max(0.28, prev + (rand() - 0.5) * 0.09));
+      } else {
+        var drift = (outcome === 'up' ? -1 : 1) * (0.02 + rand() * 0.022);
+        next = Math.min(0.94, Math.max(0.06, prev + drift + (rand() - 0.5) * 0.05));
+      }
+      ys.push(next);
+    }
+    var target = outcome === 'up'
+      ? Math.min(ys[N - 1], start - 0.28)
+      : Math.max(ys[N - 1], start + 0.28);
+    ys[N - 1] = Math.min(0.92, Math.max(0.08, target));
+    ys[N - 2] = (ys[N - 2] + ys[N - 1]) / 2;
+
+    function pt(y, i) {
+      return ((i / (N - 1)) * 100).toFixed(2) + ',' + (y * CHART_H).toFixed(1);
+    }
+    return {
+      pre: ys.slice(0, split + 1).map(pt).join(' '),
+      post: ys.slice(split).map(function (y, j) { return pt(y, split + j); }).join(' '),
+      baselineY: start * CHART_H,
+      endY: ys[N - 1] * CHART_H,
+    };
+  }
+
+  /** Odometer readout, mirroring CountUpMoney's ease-out cubic. */
+  function countUp(el, from, to, fmt, ms) {
+    ms = ms || COUNT_MS;
+    if (reduceMotion || from === to) { el.textContent = fmt(to); return; }
+    var start = Date.now();
+    var settled = false;
+    function finish() {
+      if (settled) return;
+      settled = true;
+      el.textContent = fmt(to);
+    }
+    (function tick() {
+      if (settled) return;
+      var t = Math.min(1, (Date.now() - start) / ms);
+      var eased = 1 - Math.pow(1 - t, 3);
+      el.textContent = fmt(from + (to - from) * eased);
+      if (t < 1) requestAnimationFrame(tick); else finish();
+    })();
+    // rAF is suspended in background tabs, which would otherwise strand the
+    // reader on the starting value — i.e. the wrong number, not just a missing
+    // animation. Guarantee the final figure lands either way.
+    setTimeout(finish, ms + 60);
+  }
+
   function esc(s) {
     return String(s).replace(/[&<>"']/g, function (c) {
       return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
@@ -97,6 +184,7 @@
     var order = entry[1];
     var opts = order.map(function (i) { return s.opts[i]; });
     return {
+      id: s.id,
       cat: s.cat,
       date: s.date,
       setup: s.setup,
@@ -171,18 +259,23 @@
            '<span>' + text + '</span></div>';
   }
 
-  function topbar() {
-    var pnl = state.book - R.STARTING_BOOK;
+  /** `shownBook` lets the header lag the real book while the market is still
+   *  "deciding" — otherwise the number spoils the outcome before the chart
+   *  lands. Same trick as displayBook in the app. */
+  function topbar(shownBook, settled) {
+    var book = typeof shownBook === 'number' ? shownBook : state.book;
+    var revealed = settled === undefined ? state.decisions.length : settled;
+    var pnl = book - R.STARTING_BOOK;
     var pips = '';
     for (var i = 0; i < R.DECISIONS_PER_DAY; i++) {
       var cls = 'fl-pip';
-      if (i < state.decisions.length) cls += state.decisions[i].correct ? ' win' : ' loss';
-      else if (i === state.decisions.length) cls += ' now';
+      if (i < revealed) cls += state.decisions[i].correct ? ' win' : ' loss';
+      else if (i === revealed) cls += ' now';
       pips += '<span class="' + cls + '"></span>';
     }
     return '<div class="fl-topbar">' +
-      '<div><span class="fl-topbar-book">' + money(state.book) + '</span> ' +
-      '<span class="fl-topbar-pnl ' + (pnl >= 0 ? 'fl-up' : 'fl-down') + '">' +
+      '<div><span class="fl-topbar-book" id="fl-topbook">' + money(book) + '</span> ' +
+      '<span class="fl-topbar-pnl ' + (pnl >= 0 ? 'fl-up' : 'fl-down') + '" id="fl-toppnl">' +
       (pnl === 0 ? '' : signedMoney(pnl) + ' today') + '</span></div>' +
       '<div class="fl-pips">' + pips + '</div>' +
     '</div>';
@@ -274,15 +367,70 @@
   function lockIn(s, choice, stakePct, hotRun) {
     var correct = choice === s.correctIndex;
     var delta = decisionDelta(R.STARTING_BOOK, stakePct, correct, hotRun);
+    var bookBefore = state.book;
     state.book = Math.max(0, state.book + delta);
     state.decisions.push({
+      // `id` and `choice` are what submit_floor_day() verifies against its
+      // md5 answer key — it never trusts a client-computed P&L.
+      id: s.id,
+      choice: s.options[choice],
       cat: s.cat, date: s.date, stakePct: stakePct, correct: correct, delta: delta,
     });
     save();
-    renderReveal(s, choice, correct, delta, hotRun >= R.HOT_STREAK_AT);
+    renderDeciding(s, choice, correct, delta, hotRun >= R.HOT_STREAK_AT, bookBefore);
   }
 
-  function renderReveal(s, choice, correct, delta, wasHot) {
+  /** The suspense beat: the price path draws itself left→right while the
+   *  header still shows the pre-decision book. Only when it lands do the
+   *  verdict and the new book appear. */
+  function renderDeciding(s, choice, correct, delta, wasHot, bookBefore) {
+    var outcome = correct ? 'up' : 'down';
+    var c = buildChart(state.day + ':' + s.id, outcome);
+    var settled = state.decisions.length - 1; // this one isn't revealed yet
+
+    shell.innerHTML =
+      topbar(bookBefore, settled) +
+      '<div class="fl-card">' +
+        '<div class="fl-chart" id="fl-chart">' +
+          '<svg class="fl-chart-grid" viewBox="0 0 100 ' + CHART_H + '" preserveAspectRatio="none">' +
+            '<line x1="0" y1="' + (CHART_H * 0.25) + '" x2="100" y2="' + (CHART_H * 0.25) + '" />' +
+            '<line x1="0" y1="' + (CHART_H * 0.5) + '" x2="100" y2="' + (CHART_H * 0.5) + '" />' +
+            '<line x1="0" y1="' + (CHART_H * 0.75) + '" x2="100" y2="' + (CHART_H * 0.75) + '" />' +
+            '<line class="fl-chart-baseline" x1="0" y1="' + c.baselineY + '" x2="100" y2="' + c.baselineY + '" />' +
+          '</svg>' +
+          '<div class="fl-chart-mask" id="fl-chart-mask">' +
+            '<svg viewBox="0 0 100 ' + CHART_H + '" preserveAspectRatio="none">' +
+              '<polyline class="fl-chart-pre" points="' + c.pre + '" />' +
+              '<polyline class="fl-chart-post ' + outcome + '" points="' + c.post + '" />' +
+            '</svg>' +
+          '</div>' +
+          '<div class="fl-chart-dot ' + outcome + '" id="fl-chart-dot" ' +
+            'style="left:100%;top:' + ((c.endY / CHART_H) * 100).toFixed(2) + '%"></div>' +
+        '</div>' +
+        '<p class="fl-deciding">The market is deciding…</p>' +
+      '</div>';
+
+    var mask = document.getElementById('fl-chart-mask');
+    var dot = document.getElementById('fl-chart-dot');
+
+    function land() {
+      dot.classList.add('in');
+      renderReveal(s, choice, correct, delta, wasHot, bookBefore);
+    }
+
+    if (reduceMotion) return land();
+
+    // Width mask, same easing curve as the app's withTiming bezier. Driven by
+    // a forced reflow rather than rAF so it still starts in a tab that isn't
+    // compositing; `land` is on a timer regardless, so the reveal always
+    // arrives even if the transition itself never paints.
+    mask.style.transition = 'width ' + CHART_MS + 'ms cubic-bezier(0.25, 0.1, 0.35, 1)';
+    void mask.offsetWidth;
+    mask.style.width = '100%';
+    setTimeout(land, CHART_MS + 80);
+  }
+
+  function renderReveal(s, choice, correct, delta, wasHot, bookBefore) {
     var word = correct ? (wasHot ? 'Hot hand!' : 'Good call') : 'Wrong side';
     var margined = state.book < R.MARGIN_CALL_FLOOR;
     var last = state.decisions.length >= R.DECISIONS_PER_DAY;
@@ -292,7 +440,8 @@
       '<div class="fl-card">' +
         '<div class="fl-verdict">' +
           '<div class="fl-verdict-word ' + (correct ? 'fl-up' : 'fl-down') + '">' + word + '</div>' +
-          '<div class="fl-verdict-delta ' + (correct ? 'fl-up' : 'fl-down') + '">' + signedMoney(delta) + '</div>' +
+          '<div class="fl-verdict-delta ' + (correct ? 'fl-up' : 'fl-down') + '" id="fl-delta">' +
+            signedMoney(0) + '</div>' +
         '</div>' +
         '<div class="fl-options">' +
           s.options.map(function (opt, i) {
@@ -315,6 +464,13 @@
           (last ? 'Closing bell' : 'Next decision') +
         '</button>' +
       '</div>';
+
+    // Count the delta and the header book up together, so the number landing
+    // is the moment the result registers — same beat as the app.
+    var deltaEl = document.getElementById('fl-delta');
+    if (deltaEl) countUp(deltaEl, 0, delta, signedMoney);
+    var bookEl = document.getElementById('fl-topbook');
+    if (bookEl && typeof bookBefore === 'number') countUp(bookEl, bookBefore, state.book, money);
 
     document.getElementById('fl-next').addEventListener('click', function () {
       if (last) { state.done = true; }
@@ -356,6 +512,9 @@
           '<button class="fl-btn fl-btn-primary" id="fl-share">Share your result</button>' +
         '</div>' +
         '<div class="fl-share-toast" id="fl-toast"></div>' +
+        // Filled by floor-auth.js — kept out of this file so the game still
+        // works end to end if the auth module fails to load.
+        '<div id="fl-save"></div>' +
         '<div class="fl-upsell">' +
           '<p>That was one session. Basis runs a new one every day — with streaks, ' +
           'a worldwide leaderboard, and 11 free tracks that teach the thinking behind these calls.</p>' +
@@ -367,6 +526,13 @@
 
     document.getElementById('fl-share').addEventListener('click', onShare);
     startCountdown();
+
+    // Tell the auth module there's a finished session worth saving. Fired on
+    // every result render (including a resumed one), so arriving back from an
+    // OAuth redirect lands on a screen that can immediately offer the save.
+    document.dispatchEvent(new CustomEvent('floor:result', {
+      detail: { day: state.day, session: plan.n },
+    }));
   }
 
   /** Wordle-style: the shape of the day, no spoilers. */
