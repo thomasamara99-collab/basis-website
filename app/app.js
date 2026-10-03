@@ -12,6 +12,7 @@
    union-of-completed / max-of-xp exactly like SyncBridge does.
    ============================================================ */
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+import { diagram } from '/app/diagrams.js';
 
 const SUPABASE_URL = 'https://qggmevyefongdmimwpzj.supabase.co';
 const SUPABASE_ANON_KEY =
@@ -63,6 +64,7 @@ const blank = () => ({
 let state = load();
 let session = null;
 let lessonsLoaded = false;
+let isPremium = false;   // mirrored from profiles.is_premium on sync
 
 function load() {
   try {
@@ -97,10 +99,14 @@ async function pull() {
   if (!session) return null;
   const { data, error } = await supabase
     .from('profiles')
-    .select('xp, streak, last_active_day, completed, scores')
+    .select('xp, streak, last_active_day, completed, scores, is_premium')
     .eq('id', session.user.id)
     .maybeSingle();
   if (error || !data) return null;
+  // Subscribing happens in the app (billing lives with Apple); the web side
+  // only reads the resulting entitlement so a subscriber's Pro modules open
+  // here too.
+  isPremium = !!data.is_premium;
   return {
     xp: data.xp ?? 0,
     streak: data.streak ?? 0,
@@ -308,13 +314,17 @@ function viewTrack(id) {
         </div>
         ${m.lessons.map((l) => {
           const done = !!state.completed[l.id];
-          const locked = l.soon || m.premium;
-          const cls = 'ba-lesson' + (done ? ' done' : '') + (locked ? ' locked' : '');
+          // Premium rows stay tappable — they lead to the paywall, or straight
+          // into the lesson for a subscriber. Only unauthored ones are inert.
+          const pro = m.premium && !isPremium;
+          const cls = 'ba-lesson' + (done ? ' done' : '')
+            + (l.soon ? ' locked' : '') + (pro ? ' pro' : '');
+          const badge = l.soon ? 'Soon' : (m.premium && !isPremium ? 'Pro' : '+' + l.xp + ' XP');
           const inner = `
-            <span class="ba-lesson-mark">${done ? '✓' : (locked ? '🔒' : '')}</span>
+            <span class="ba-lesson-mark">${done ? '✓' : (l.soon ? '🔒' : (pro ? '★' : ''))}</span>
             <span class="ba-lesson-title">${esc(l.title)}</span>
-            <span class="ba-lesson-xp">${l.soon ? 'Soon' : (m.premium ? 'Pro' : '+' + l.xp + ' XP')}</span>`;
-          return locked
+            <span class="ba-lesson-xp">${badge}</span>`;
+          return l.soon
             ? `<div class="${cls}">${inner}</div>`
             : `<a class="${cls}" href="#/lesson/${esc(l.id)}">${inner}</a>`;
         }).join('')}
@@ -338,8 +348,17 @@ async function viewLesson(id) {
   } catch {
     return render('<div class="ba-card"><p class="ba-sub">Couldn\'t load the lesson. Check your connection and try again.</p></div>');
   }
-  const L = (window.__BASIS_LESSONS__ || {})[id];
+  let L = (window.__BASIS_LESSONS__ || {})[id];
   if (!L) return go('#/');
+
+  // Premium bodies aren't in the bundle — fetch them, gated, for subscribers.
+  if (L.locked) {
+    if (!session || !isPremium) return viewPaywall(L);
+    render('<div class="ba-loading">Unlocking lesson…</div>');
+    const { data, error } = await supabase.rpc('get_premium_lesson', { p_id: id });
+    if (error || !data) return viewPaywall(L, error ? error.message : null);
+    L = data;
+  }
 
   // phase: teaching sections first, then one question at a time — the app's
   // rule is that the material must cover everything the quiz tests.
@@ -365,6 +384,7 @@ async function viewLesson(id) {
       <p class="ba-eyebrow">${esc(L.trackTitle)}</p>
       ${step === 0 ? `<h1 class="ba-h1">${esc(L.title)}</h1><p class="ba-lead">${rich(L.intro)}</p>` : ''}
       ${s.heading ? `<h2 class="ba-h2">${esc(s.heading)}</h2>` : ''}
+      ${s.visual ? diagram(s.visual, L.color) : ''}
       <p class="ba-body">${rich(s.body)}</p>
       ${s.formula ? `<div class="ba-formula">${esc(s.formula)}</div>` : ''}
       ${s.bullets && s.bullets.length
@@ -455,6 +475,77 @@ async function viewLesson(id) {
   advance();
 }
 
+// ── Paywall ─────────────────────────────────────────────────
+/** Read from the shipped index rather than restated in prose: a hand-written
+ *  perk list drifts the moment the Career Accelerator changes, and a paywall
+ *  that promises a lesson that isn't there is the worst kind of stale copy. */
+function premiumModules() {
+  const out = [];
+  for (const t of (window.__BASIS_TRACKS__ || [])) {
+    for (const m of t.modules) if (m.premium) out.push(m);
+  }
+  return out;
+}
+
+function premiumLessonCount() {
+  return premiumModules().reduce((n, m) => n + m.lessons.length, 0);
+}
+
+/** Shown instead of a premium lesson. Deliberately does not pretend to sell:
+ *  there is no web checkout yet, so the honest flow is "subscribe in the app,
+ *  then sign in here and it opens". */
+function viewPaywall(L, failure) {
+  render(`
+    ${header()}
+    <a class="ba-back" href="#/track/${esc(L.trackId)}">← ${esc(L.trackTitle)}</a>
+    <div class="ba-card ba-paywall">
+      <p class="ba-eyebrow gold">Career Accelerator</p>
+      <h1 class="ba-h1">${esc(L.title)}</h1>
+      <p class="ba-sub">${esc(L.intro)}</p>
+
+      ${premiumModules().map((m) => `
+        <p class="ba-perk-head">${esc(m.title)}</p>
+        <ul class="ba-perks">${m.lessons.map((l) => `<li>${esc(l.title)}</li>`).join('')}</ul>`).join('')}
+      <p class="ba-pro-count">${premiumLessonCount()} Career Accelerator lessons · one subscription, app and web</p>
+
+      <div class="ba-prices">
+        <div class="ba-price"><span>Monthly</span><strong>£7.99</strong><em>per month</em></div>
+        <div class="ba-price best"><span>Annual</span><strong>£49.99</strong><em>£4.17/mo · save 48%</em></div>
+      </div>
+
+      ${failure ? `<p class="ba-paywall-err">${esc(failure)}</p>` : ''}
+
+      <a class="ba-btn ba-btn-gold" href="${APP_STORE}">Subscribe in the app</a>
+      <p class="ba-fineprint">Billed through your Apple ID; cancel anytime in Settings.
+        Prices shown in GBP — your App Store charges in your own currency.
+        Subscriptions are handled in the app: sign in here with the same account
+        and your Pro lessons unlock on the web too.</p>
+
+      ${session
+        ? `<p class="ba-fineprint">Signed in as ${esc(session.user.email || 'your account')}${
+            isPremium ? '.' : ' — no active subscription found on this account.'}</p>`
+        : `<div id="ba-unlock"></div>`}
+    </div>`);
+
+  if (!session) renderUnlockPrompt();
+}
+
+/** The paywall's own sign-in box: someone here may already be paying in the
+ *  app, in which case the honest CTA is "sign in", not "subscribe". */
+function renderUnlockPrompt() {
+  const el = document.getElementById('ba-unlock');
+  if (!el) return;
+  el.innerHTML = `
+    <div class="ba-savebox">
+      <p class="ba-savebox-title">Already subscribed?</p>
+      <p class="ba-sub">Sign in with the account you use in the app and this lesson opens right here.</p>
+      <button class="ba-btn ba-btn-oauth" data-p="google">Continue with Google</button>
+      <button class="ba-btn ba-btn-oauth" data-p="apple">Continue with Apple</button>
+    </div>`;
+  el.querySelectorAll('[data-p]').forEach((b) =>
+    b.addEventListener('click', () => oauth(b.dataset.p)));
+}
+
 // ── Account ─────────────────────────────────────────────────
 function renderSavePrompt() {
   const el = document.getElementById('ba-save');
@@ -474,11 +565,28 @@ function renderSavePrompt() {
     b.addEventListener('click', () => oauth(b.dataset.p)));
 }
 
+const RETURN_KEY = 'basis.app.return';
+
 async function oauth(provider) {
+  // The route hash deliberately does NOT go into redirectTo: Supabase matches
+  // the whole redirect URL against its allowlist, so every lesson route would
+  // need allowlisting, and the ?code= it appends sits awkwardly beside an
+  // existing fragment. Stash the route here and restore it on the way back —
+  // only /app has to be allowlisted.
+  try { sessionStorage.setItem(RETURN_KEY, window.location.hash || ''); } catch {}
   await supabase.auth.signInWithOAuth({
     provider,
-    options: { redirectTo: window.location.origin + '/app' + window.location.hash },
+    options: { redirectTo: window.location.origin + '/app' },
   });
+}
+
+function consumeReturnHash() {
+  let h = '';
+  try {
+    h = sessionStorage.getItem(RETURN_KEY) || '';
+    sessionStorage.removeItem(RETURN_KEY);
+  } catch { /* private mode — they just land on the path screen */ }
+  return h;
 }
 
 function viewProfile() {
@@ -558,5 +666,10 @@ supabase.auth.onAuthStateChange(async (_e, s) => {
   const { data } = await supabase.auth.getSession();
   session = data.session;
   if (session) { try { await syncNow(); } catch {} }
+  const back = consumeReturnHash();
+  if (back && back !== (window.location.hash || '')) {
+    window.location.hash = back; // fires hashchange -> route()
+    return;
+  }
   route();
 })();
