@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>The Floor — A Daily Market Game from Real History | Basis</title>
+  <meta name="description" content="One market session a day, drawn from real history. Five decisions, the same five for everyone on Earth. Size your conviction, then live with it. Free, no download, no sign-up." />
+  <meta property="og:title" content="The Floor — one market session a day, from real history" />
+  <meta property="og:description" content="Five real decisions from market history. The same five for everyone on Earth, every day. How would you have traded them?" />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://www.basisfinance.app/floor" />
+  <meta property="og:image" content="https://www.basisfinance.app/icon.png" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <link rel="canonical" href="https://www.basisfinance.app/floor" />
+  <link rel="icon" href="/favicon.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/styles.css" />
+  <link rel="stylesheet" href="/floor/floor.css" />
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav class="nav">
+    <div class="container nav-inner">
+      <a href="/" class="nav-logo">
+        <img src="/icon.png" alt="" class="nav-logo-mark" />
+        Basis
+      </a>
+      <ul class="nav-links">
+        <li><a href="/floor">The Floor</a></li>
+        <li><a href="/learn">Learn</a></li>
+        <li><a href="/privacy">Privacy</a></li>
+        <li><a href="/terms">Terms</a></li>
+        <li><a href="/support">Support</a></li>
+      </ul>
+      <a href="https://apps.apple.com/app/basis-learn-finance-markets/id6784982377" class="btn btn-primary nav-cta">Download</a>
+      <button class="nav-toggle" aria-label="Toggle navigation" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </nav>
+
+  <main class="floor-main">
+    <div class="floor-shell" id="floor-shell">
+      <!-- Everything below is rendered by floor.js -->
+      <div class="fl-loading" id="fl-loading">
+        <p>Opening the floor…</p>
+      </div>
+    </div>
+
+    <!-- Static SEO/explainer content, always present for crawlers -->
+    <section class="floor-about container">
+      <h2>What is The Floor?</h2>
+      <p>
+        The Floor is a daily market game. You run a $100,000 virtual book
+        through five decisions — and every one of them is a real, documented
+        episode from market history: the March 2020 liquidity crunch, the SNB
+        abandoning the franc peg, Wirecard, the gilt/LDI spiral, SVB.
+      </p>
+      <p>
+        Everyone on Earth gets the same five decisions each day, so this
+        measures judgment rather than grind. Before each call resolves you
+        choose how much of your book to risk — being right small can lose to
+        being right big, exactly like real markets. A correct call pays 1.5×
+        your stake; three right in a row and the hot hand pays 2×. Drop under
+        $25,000 and you're margin-called.
+      </p>
+      <p>
+        After every decision you find out what actually happened, and why.
+        That's the point — history is the answer key.
+      </p>
+      <p class="floor-about-cta">
+        The Floor is one part of <a href="/">Basis</a>, a free app that teaches
+        finance from "what's a stock?" to interview-ready across 11 tracks.
+        Streaks, leaderboards and the full curriculum live in the app.
+      </p>
+    </section>
+  </main>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="container">
+      <div class="footer-inner">
+        <div class="footer-logo">
+          <img src="/icon.png" alt="" class="nav-logo-mark" />
+          Basis
+        </div>
+        <nav class="footer-links">
+          <a href="/learn">Learn</a>
+          <a href="/privacy">Privacy Policy</a>
+          <a href="/terms">Terms of Service</a>
+          <a href="/support">Support</a>
+          <a href="mailto:legal@basisfinance.app">Contact</a>
+        </nav>
+        <p class="footer-copy">&copy; 2026 Basis. All rights reserved.</p>
+      </div>
+    </div>
+  </footer>
+
+  <script src="/floor/floor-data.js"></script>
+  <script src="/floor/floor.js"></script>
+  <script defer src="/_vercel/insights/script.js"></script>
+</body>
+</html>
