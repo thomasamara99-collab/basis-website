@@ -1,0 +1,278 @@
+/* ============================================================
+   BASIS web app — reuses the site's tokens from /styles.css
+   ============================================================ */
+.ba-main { padding-top: var(--sp-10); padding-bottom: var(--sp-20); }
+
+.ba-shell {
+  max-width: 620px;
+  margin-inline: auto;
+  padding-inline: var(--pad-x);
+}
+
+.ba-loading { text-align: center; color: var(--text-muted); padding-block: var(--sp-24); }
+
+/* ── Cards & type ───────────────────────────────────────── */
+.ba-card {
+  background: rgba(22, 24, 31, 0.9);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  padding: var(--sp-6);
+  margin-bottom: var(--sp-5);
+}
+
+.ba-eyebrow {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--tc, var(--accent));
+  margin-bottom: var(--sp-2);
+}
+
+.ba-h1 {
+  font-family: var(--font-display);
+  font-size: clamp(24px, 4.5vw, 32px);
+  font-weight: 700;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+  color: var(--text-primary);
+  margin-bottom: var(--sp-3);
+}
+
+.ba-h2 {
+  font-family: var(--font-display);
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 1.35;
+  color: var(--text-primary);
+  margin-bottom: var(--sp-3);
+}
+
+.ba-sub { font-size: 14.5px; line-height: 1.65; color: var(--text-secondary); margin-bottom: var(--sp-4); }
+.ba-sub:last-child { margin-bottom: 0; }
+.ba-lead { font-size: 16px; line-height: 1.6; color: var(--text-secondary); margin-bottom: var(--sp-4); }
+.ba-body { font-size: 15px; line-height: 1.7; color: var(--text-secondary); margin-bottom: var(--sp-4); }
+.ba-body strong, .ba-bullets strong, .ba-lead strong { color: var(--text-primary); font-weight: 700; }
+
+.ba-formula {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 14px;
+  color: var(--text-primary);
+  background: rgba(13, 14, 18, 0.8);
+  border: 1px solid var(--hairline);
+  border-radius: var(--r-md);
+  padding: var(--sp-4);
+  margin-bottom: var(--sp-4);
+  overflow-x: auto;
+}
+
+.ba-bullets { margin: 0 0 var(--sp-4) var(--sp-5); padding: 0; }
+.ba-bullets li { font-size: 14.5px; line-height: 1.6; color: var(--text-secondary); margin-bottom: var(--sp-2); }
+
+/* ── Header / progress ──────────────────────────────────── */
+.ba-header { margin-bottom: var(--sp-5); }
+.ba-header-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: var(--sp-3); }
+.ba-level { display: flex; flex-direction: column; gap: 2px; text-decoration: none; }
+.ba-level-title { font-family: var(--font-display); font-size: 17px; font-weight: 700; color: var(--text-primary); }
+.ba-level-xp { font-size: 12.5px; color: var(--text-muted); }
+.ba-streak { font-size: 14px; font-weight: 700; color: var(--streak); }
+
+.ba-bar { height: 6px; border-radius: 999px; background: rgba(255,255,255,0.08); overflow: hidden; }
+.ba-bar.sm { height: 4px; }
+.ba-bar.wide { flex: 1; }
+.ba-bar-fill { height: 100%; background: var(--tc, var(--accent)); border-radius: 999px; transition: width 0.4s ease; }
+.ba-next-level { font-size: 12px; color: var(--text-muted); margin-top: var(--sp-2); }
+
+/* ── Home ───────────────────────────────────────────────── */
+.ba-continue {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-4);
+  background: var(--accent-muted);
+  border: 1px solid rgba(130, 52, 250, 0.45);
+  border-radius: var(--r-lg);
+  padding: var(--sp-5);
+  margin-bottom: var(--sp-6);
+  text-decoration: none;
+  transition: border-color 0.15s;
+}
+.ba-continue:hover { border-color: var(--accent); }
+.ba-continue-title { font-family: var(--font-display); font-size: 17px; font-weight: 700; color: var(--text-primary); }
+.ba-continue-sub { font-size: 13px; color: var(--text-secondary); margin-top: 2px; }
+.ba-continue-arrow { font-size: 20px; color: var(--accent); }
+
+.ba-section-title {
+  font-size: 11px; font-weight: 700; letter-spacing: 0.12em;
+  text-transform: uppercase; color: var(--text-muted); margin-bottom: var(--sp-3);
+}
+
+.ba-tracks { display: flex; flex-direction: column; gap: var(--sp-3); margin-bottom: var(--sp-6); }
+.ba-track {
+  display: block;
+  background: rgba(22, 24, 31, 0.88);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  padding: var(--sp-4);
+  text-decoration: none;
+  transition: border-color 0.15s;
+}
+.ba-track:hover { border-color: rgba(255,255,255,0.18); }
+.ba-track-top { display: flex; align-items: center; gap: var(--sp-3); margin-bottom: var(--sp-3); }
+.ba-track-dot { width: 10px; height: 10px; border-radius: 50%; background: var(--tc); flex-shrink: 0; }
+.ba-track-name { flex: 1; font-size: 15px; font-weight: 600; color: var(--text-primary); }
+.ba-track-count { font-size: 12.5px; color: var(--text-muted); font-variant-numeric: tabular-nums; }
+.ba-pick {
+  font-size: 10px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase;
+  color: var(--accent); background: var(--accent-muted); padding: 2px 7px; border-radius: 999px;
+}
+
+/* ── Track detail ───────────────────────────────────────── */
+.ba-back { display: inline-block; font-size: 13px; color: var(--text-muted); text-decoration: none; margin-bottom: var(--sp-4); }
+.ba-back:hover { color: var(--text-primary); }
+
+.ba-module { margin-bottom: var(--sp-6); }
+.ba-module-head { display: flex; align-items: center; gap: var(--sp-3); margin-bottom: var(--sp-3); }
+.ba-module-head h3 { font-family: var(--font-display); font-size: 15px; font-weight: 700; color: var(--text-primary); }
+.ba-lock {
+  font-size: 10px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase;
+  color: var(--gold); background: var(--gold-muted); padding: 2px 7px; border-radius: 999px;
+}
+
+.ba-lesson {
+  display: flex; align-items: center; gap: var(--sp-3);
+  background: rgba(22, 24, 31, 0.7);
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  padding: var(--sp-3) var(--sp-4);
+  margin-bottom: var(--sp-2);
+  text-decoration: none;
+  transition: border-color 0.15s;
+}
+.ba-lesson:hover:not(.locked) { border-color: rgba(255,255,255,0.18); }
+.ba-lesson.done { border-color: rgba(34,197,94,0.35); background: rgba(34,197,94,0.07); }
+.ba-lesson.locked { opacity: 0.5; }
+.ba-lesson-mark { width: 16px; color: var(--success); font-size: 13px; }
+.ba-lesson-title { flex: 1; font-size: 14px; color: var(--text-primary); }
+.ba-lesson-xp { font-size: 12px; color: var(--text-muted); white-space: nowrap; }
+
+/* ── Lesson player ──────────────────────────────────────── */
+.ba-lesson-top { display: flex; align-items: center; gap: var(--sp-4); margin-bottom: var(--sp-4); }
+.ba-close { font-size: 18px; color: var(--text-muted); text-decoration: none; }
+.ba-close:hover { color: var(--text-primary); }
+.ba-lesson-count { font-size: 12px; color: var(--text-muted); font-variant-numeric: tabular-nums; }
+
+.ba-options { display: flex; flex-direction: column; gap: var(--sp-3); margin-bottom: var(--sp-5); }
+.ba-opt {
+  display: flex; gap: var(--sp-3); align-items: flex-start; width: 100%; text-align: left;
+  background: rgba(13, 14, 18, 0.6);
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  padding: var(--sp-4);
+  color: var(--text-secondary);
+  font-family: inherit; font-size: 14.5px; line-height: 1.5;
+  cursor: pointer; transition: border-color 0.15s, background 0.15s;
+}
+.ba-opt:hover:not(:disabled) { border-color: rgba(255,255,255,0.2); }
+.ba-opt:disabled { cursor: default; }
+.ba-opt-key { flex-shrink: 0; font-weight: 700; font-size: 12px; color: var(--text-muted); width: 14px; }
+.ba-opt.sel { border-color: var(--accent); background: var(--accent-muted); color: var(--text-primary); }
+.ba-opt.sel .ba-opt-key { color: var(--accent); }
+.ba-opt.right { border-color: var(--success); background: rgba(34,197,94,0.12); color: var(--text-primary); }
+.ba-opt.right .ba-opt-key { color: var(--success); }
+.ba-opt.wrong { border-color: #F87171; background: rgba(248,113,113,0.12); color: var(--text-primary); }
+.ba-opt.wrong .ba-opt-key { color: #F87171; }
+
+.ba-explain {
+  border-radius: var(--r-md);
+  padding: var(--sp-4);
+  margin-bottom: var(--sp-4);
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--text-secondary);
+  border: 1px solid var(--hairline);
+}
+.ba-explain.right { border-color: rgba(34,197,94,0.3); background: rgba(34,197,94,0.07); }
+.ba-explain.wrong { border-color: rgba(248,113,113,0.3); background: rgba(248,113,113,0.07); }
+.ba-explain-head { font-weight: 700; margin-bottom: var(--sp-2); color: var(--text-primary); }
+
+/* ── Completion ─────────────────────────────────────────── */
+.ba-done { text-align: center; }
+.ba-done-mark {
+  font-size: 30px; color: var(--success); width: 62px; height: 62px; line-height: 62px;
+  margin: 0 auto var(--sp-4); border-radius: 50%; background: rgba(34,197,94,0.14);
+}
+.ba-done-actions { display: flex; flex-direction: column; gap: var(--sp-2); margin-top: var(--sp-5); }
+
+/* ── Onboarding ─────────────────────────────────────────── */
+.ba-topics { display: flex; flex-wrap: wrap; gap: var(--sp-2); margin-bottom: var(--sp-6); }
+.ba-topic {
+  display: inline-flex; align-items: center; gap: 7px;
+  background: rgba(13,14,18,0.6);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 9px 14px;
+  color: var(--text-secondary);
+  font-family: inherit; font-size: 13.5px; cursor: pointer;
+  transition: border-color 0.15s, background 0.15s, color 0.15s;
+}
+.ba-topic-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--tc); }
+.ba-topic:hover { border-color: rgba(255,255,255,0.2); }
+.ba-topic.on { border-color: var(--accent); background: var(--accent-muted); color: var(--text-primary); }
+
+/* ── Profile ────────────────────────────────────────────── */
+.ba-stats { display: flex; gap: var(--sp-4); margin-block: var(--sp-5); }
+.ba-stats div { flex: 1; text-align: center; background: rgba(13,14,18,0.6); border: 1px solid var(--hairline); border-radius: var(--r-md); padding: var(--sp-4) var(--sp-2); }
+.ba-stats strong { display: block; font-family: var(--font-display); font-size: 20px; color: var(--text-primary); }
+.ba-stats span { font-size: 11.5px; color: var(--text-muted); }
+
+.ba-rung {
+  display: flex; justify-content: space-between;
+  padding-block: var(--sp-3);
+  border-bottom: 1px solid var(--hairline);
+  font-size: 14px; color: var(--text-muted);
+}
+.ba-rung:last-child { border-bottom: none; }
+.ba-rung.on { color: var(--text-primary); font-weight: 600; }
+
+/* ── Account prompt ─────────────────────────────────────── */
+.ba-savebox {
+  border: 1px solid rgba(130,52,250,0.4);
+  background: var(--accent-muted);
+  border-radius: var(--r-lg);
+  padding: var(--sp-5);
+  margin-top: var(--sp-5);
+  text-align: left;
+}
+.ba-savebox-title { font-family: var(--font-display); font-size: 16px; font-weight: 700; color: var(--text-primary); margin-bottom: var(--sp-2); }
+.ba-saved { font-size: 13.5px; color: var(--success); margin-top: var(--sp-4); }
+
+/* ── Buttons ────────────────────────────────────────────── */
+.ba-btn {
+  display: block; width: 100%; text-align: center;
+  border: none; border-radius: var(--r-lg);
+  padding: var(--sp-4);
+  font-family: var(--font-sans); font-size: 15px; font-weight: 700;
+  cursor: pointer; text-decoration: none;
+  margin-top: var(--sp-2);
+  transition: opacity 0.15s, background 0.15s;
+}
+.ba-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+.ba-btn-primary { background: var(--accent); color: #fff; }
+.ba-btn-primary:hover:not(:disabled) { background: var(--accent-hover); }
+.ba-btn-go { background: var(--success); color: #04120A; }
+.ba-btn-oauth { background: var(--text-primary); color: var(--bg); }
+.ba-btn-oauth:hover { background: #e8eaed; }
+.ba-btn-ghost { background: transparent; border: 1px solid var(--border); color: var(--text-secondary); }
+.ba-btn-ghost:hover { border-color: rgba(255,255,255,0.2); color: var(--text-primary); }
+
+/* ── App CTA ────────────────────────────────────────────── */
+.ba-appcta {
+  text-align: center;
+  border-top: 1px solid var(--hairline);
+  padding-top: var(--sp-6);
+  margin-top: var(--sp-6);
+}
+.ba-appcta p { font-size: 14px; line-height: 1.6; color: var(--text-secondary); margin-bottom: var(--sp-4); }
