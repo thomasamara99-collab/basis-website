@@ -81,6 +81,7 @@ const blank = () => ({
   dailyGoal: 20,
   username: null,
   avatarId: 'mascot_violet',
+  theme: 'dark',        // matches the app's default (useThemeStore)
   dayXp: {},             // { 'YYYY-MM-DD': xp } — powers the daily goal ring
 });
 
@@ -323,6 +324,30 @@ export async function signOut() {
 }
 
 export function setSession(s) { session = s; }
+
+// ── Theme ───────────────────────────────────────────────────
+/** Mirrors useThemeStore in the app: dark by default, toggled in Profile.
+ *  theme.css carries the light palette under [data-theme='light']. */
+export function applyTheme(mode) {
+  const m = mode === 'light' ? 'light' : 'dark';
+  state.theme = m;
+  save();
+  if (m === 'light') document.documentElement.setAttribute('data-theme', 'light');
+  else document.documentElement.removeAttribute('data-theme');
+}
+
+/** src/data/avatars.ts — colour-themed discs around the Bax mascot. */
+export const AVATARS = [
+  { id: 'mascot_violet', label: 'Violet', color: '#7C3AED' },
+  { id: 'mascot_indigo', label: 'Indigo', color: '#6366F1' },
+  { id: 'mascot_gold', label: 'Gold', color: '#F4B23C' },
+  { id: 'mascot_teal', label: 'Teal', color: '#0F766E' },
+  { id: 'mascot_coral', label: 'Coral', color: '#DC2626' },
+  { id: 'mascot_green', label: 'Green', color: '#059669' },
+];
+
+export const avatarColor = (id) =>
+  (AVATARS.find((a) => a.id === id) || AVATARS[0]).color;
 
 // ── Small shared UI atoms ───────────────────────────────────
 export function mascot(mood = 'happy', size = 96) {

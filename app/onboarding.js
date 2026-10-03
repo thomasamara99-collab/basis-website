@@ -14,7 +14,7 @@
    ============================================================ */
 import {
   state, save, render, go, esc, setImmersive, oauth, baxBubble, mascot,
-  TRACKS, reduceMotion,
+  TRACKS, reduceMotion, AVATARS,
 } from '/app/core.js';
 
 // ── Static data — kept in step with src/data + app/onboarding.tsx ──────────
@@ -41,15 +41,6 @@ const GOALS = [
   { val: 10, label: 'Casual', sub: '~5 min a day' },
   { val: 20, label: 'Regular', sub: '~10 min a day' },
   { val: 30, label: 'Intense', sub: '~15 min a day' },
-];
-
-const AVATARS = [
-  { id: 'mascot_violet', label: 'Violet', color: '#7C3AED' },
-  { id: 'mascot_indigo', label: 'Indigo', color: '#6366F1' },
-  { id: 'mascot_gold', label: 'Gold', color: '#F4B23C' },
-  { id: 'mascot_teal', label: 'Teal', color: '#0F766E' },
-  { id: 'mascot_coral', label: 'Coral', color: '#DC2626' },
-  { id: 'mascot_green', label: 'Green', color: '#059669' },
 ];
 
 const BAX_CORRECT = [
