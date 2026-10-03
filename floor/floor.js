@@ -151,6 +151,25 @@
     setTimeout(finish, ms + 60);
   }
 
+  /** Bring the play area into view, clearing the sticky nav.
+   *
+   *  Every phase change swaps the whole card, and the phases differ wildly in
+   *  height — the deciding card is a 130px chart where the scenario card was a
+   *  full screen of text. Without this the document shrinks under a
+   *  scrolled-down reader and the browser lands them on the static explainer
+   *  below, so the animation plays entirely off-screen. `block: 'start'` isn't
+   *  enough on its own because the nav is sticky and would cover the top. */
+  function scrollToPlay() {
+    var nav = document.querySelector('.nav');
+    var offset = (nav ? nav.getBoundingClientRect().height : 0) + 12;
+    var y = shell.getBoundingClientRect().top + window.pageYOffset - offset;
+    try {
+      window.scrollTo({ top: Math.max(0, y), behavior: reduceMotion ? 'auto' : 'smooth' });
+    } catch (e) {
+      window.scrollTo(0, Math.max(0, y)); // older browsers: no options object
+    }
+  }
+
   function esc(s) {
     return String(s).replace(/[&<>"']/g, function (c) {
       return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
@@ -250,7 +269,7 @@
       state.started = true;
       save();
       render();
-      shell.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      scrollToPlay();
     });
   }
 
@@ -410,6 +429,11 @@
         '<p class="fl-deciding">The market is deciding…</p>' +
       '</div>';
 
+    // The reader was at the bottom of a long scenario card when they locked
+    // in; this card is a fraction of that height, so without scrolling they'd
+    // watch the whole reveal off-screen.
+    scrollToPlay();
+
     var mask = document.getElementById('fl-chart-mask');
     var dot = document.getElementById('fl-chart-dot');
 
@@ -467,6 +491,10 @@
 
     // Count the delta and the header book up together, so the number landing
     // is the moment the result registers — same beat as the app.
+    // Keep the verdict in frame too — it replaces the short chart card with a
+    // much taller one, so the number can otherwise land above the fold.
+    scrollToPlay();
+
     var deltaEl = document.getElementById('fl-delta');
     if (deltaEl) countUp(deltaEl, 0, delta, signedMoney);
     var bookEl = document.getElementById('fl-topbook');
@@ -477,7 +505,7 @@
       else { state.idx++; }
       save();
       render();
-      shell.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      scrollToPlay();
     });
   }
 
