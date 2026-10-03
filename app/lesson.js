@@ -17,15 +17,17 @@ import {
   state, save, render, go, esc, rich, richBlocks, setImmersive, ensureLessons,
   supabase, session, isPremium, mascot, countUp, confetti,
   touchStreak, addDayXp, submitWeeklyXp, levelFor, lessonAfter, syncNow,
-  XP_PER_CORRECT, QUESTION_TIME,
+  XP_PER_CORRECT, QUESTION_TIME, scheduleReview, newlyEarnedBadges,
+  rollStockBadge, STOCK_XP,
 } from '/app/core.js';
 import { diagram } from '/app/diagrams.js';
 import { viewPaywall } from '/app/paywall.js';
+import { celebrateBadge, celebratePromotion, runRewards } from '/app/celebrate.js';
 
 let timerId = null;
 function clearTimer() { if (timerId) { clearInterval(timerId); timerId = null; } }
 
-export async function viewLesson(id) {
+export async function viewLesson(id, recap = false) {
   clearTimer();
   setImmersive(true);
   render('<div class="ba-loading">Loading lesson…</div>');
@@ -49,10 +51,10 @@ export async function viewLesson(id) {
     L = data;
   }
 
-  play(L);
+  play(L, recap);
 }
 
-function play(L) {
+function play(L, recap) {
   const sections = L.sections || [];
   const questions = L.questions || [];
   const total = questions.length;
@@ -64,7 +66,9 @@ function play(L) {
   let timedOut = false;
   let timeLeft = QUESTION_TIME;
 
-  const cards = [{ kind: 'lead', body: L.intro }, ...sections.map((s) => ({ kind: 'section', ...s }))];
+  const cards = recap && total
+    ? []
+    : [{ kind: 'lead', body: L.intro }, ...sections.map((s) => ({ kind: 'section', ...s }))];
 
   // One progress scale for the whole lesson — teaching cards and questions are
   // steps in the same bar, so it never jumps when the quiz starts.
@@ -276,6 +280,9 @@ function play(L) {
     }
     const streakBefore = state.streak;
     touchStreak();
+    // Spaced repetition: >=80% pushes the next review out, below that resets
+    // it to tomorrow. Runs on replays too, which is the point of a recap.
+    scheduleReview(L.id, correctCount, total);
     save();
     syncNow().catch(() => {});
 
@@ -287,6 +294,27 @@ function play(L) {
       ? Math.min(100, ((state.xp - lp.current.minXp) / (lp.next.minXp - lp.current.minXp)) * 100)
       : 100;
     const nextId = lessonAfter(L.id);
+
+    // Rewards are queued, not stacked: the app shows the completion screen
+    // first, then badge, then stock, then promotion, each on its own screen.
+    const rewards = [];
+    for (const b of newlyEarnedBadges()) rewards.push(() => celebrateBadge(b));
+    if (isNew) {
+      const stock = rollStockBadge(L.trackId);
+      if (stock) {
+        state.xp += STOCK_XP;
+        addDayXp(STOCK_XP);
+        submitWeeklyXp(STOCK_XP);
+        rewards.push(() => celebrateBadge(stock, { label: 'Stock collected', xpBonus: STOCK_XP }));
+      }
+    }
+    if (levelUp) {
+      rewards.push(() => celebratePromotion({
+        from: levelBefore, to: levelAfter,
+        correct: correctCount, total, xpGained, streak: state.streak,
+      }));
+    }
+    if (rewards.length) { save(); syncNow().catch(() => {}); }
 
     render(`
       <div class="ba-lp done" style="--tc:${esc(L.color)}">
@@ -326,9 +354,10 @@ function play(L) {
     countUp(document.getElementById('xpv'), xpGained, 900, (v) => '+' + Math.round(v));
     if (accuracy === 100 || levelUp) confetti(document.getElementById('doneHost'), 48);
 
+    const after = (dest) => async () => { await runRewards(rewards); go(dest); };
     const nb = document.getElementById('nextl');
-    if (nb) nb.addEventListener('click', () => go('#/lesson/' + nextId));
-    document.getElementById('back').addEventListener('click', () => go('#/track/' + L.trackId));
+    if (nb) nb.addEventListener('click', after('#/lesson/' + nextId));
+    document.getElementById('back').addEventListener('click', after('#/track/' + L.trackId));
   }
 
   // Keyboard: arrows page the cards, 1-4 pick an answer, Enter confirms.
@@ -347,5 +376,6 @@ function play(L) {
     }
   };
 
-  showCards();
+  if (cards.length) showCards();
+  else startQuiz();
 }

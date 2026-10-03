@@ -16,12 +16,16 @@ import {
   setImmersive, syncNow, pushIdentity, consumeReturnHash, signOut, oauth,
   APP_STORE, TRACKS, LEVELS, levelFor, trackStats, orderedTracks,
   nextLessonIn, nextLessonOverall, xpToday, todayKey, mascot, countUp,
-  applyTheme, AVATARS, avatarColor,
+  applyTheme, AVATARS, avatarColor, BADGES, STOCKS, TRACK_STOCKS,
+  earnedBadgeIds, primeBadgesSeen, dueReviews, scenarioDoneToday,
 } from '/app/core.js';
 import { viewOnboarding } from '/app/onboarding.js';
 import { viewLesson } from '/app/lesson.js';
+import { viewScenario } from '/app/scenario.js';
+import { icon } from '/app/icons.js';
 
 const DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+const CHECK = '✓';
 /** Collapsed tracks show the frontier plus two; opening reveals in batches. */
 const PREVIEW = 3;
 const BATCH = 8;
@@ -169,6 +173,15 @@ function trackPath(track, { showMilestones, slice }) {
   return `<div class="ba-path" style="--tc:${esc(track.color)};--rail:${solid}">${html}</div>`;
 }
 
+/** Collected-stocks chip on a track header — the app's "📈 1/2". */
+function stockChip(track) {
+  const pool = TRACK_STOCKS[track.id] || [];
+  if (!pool.length) return '';
+  const owned = new Set(state.stockBadges || []);
+  const got = pool.filter((s) => owned.has(s.id)).length;
+  return `<span class="ba-stockchip ${got ? 'got' : ''}">${icon('stats-chart', 11)} ${got}/${pool.length}</span>`;
+}
+
 // ── Home ────────────────────────────────────────────────────
 function viewHome() {
   setImmersive(false);
@@ -177,6 +190,8 @@ function viewHome() {
   const goal = state.dailyGoal || 20;
   const done = xpToday();
   const met = done >= goal;
+  const due = dueReviews();
+  const scenarioDone = scenarioDoneToday();
 
   const now = new Date();
   const dow = (now.getDay() + 6) % 7; // Monday = 0
@@ -227,14 +242,22 @@ function viewHome() {
         </div>
         <div class="ba-today-chips">
           <a class="ba-chip" href="/floor" style="--cc:var(--ba-success)">
-            <span class="ba-chip-icon">↗</span><span class="ba-chip-label">The Floor</span>
+            <span class="ba-chip-icon">${icon('trending-up', 15)}</span>
+            <span class="ba-chip-label">The Floor</span>
           </a>
-          <a class="ba-chip" href="#/lesson/${up ? esc(up.lesson.id) : ''}" style="--cc:var(--ba-primary)">
-            <span class="ba-chip-icon">▶</span><span class="ba-chip-label">Lesson</span>
+          <a class="ba-chip ${scenarioDone ? 'done' : ''}" href="#/scenario" style="--cc:var(--ba-primary)">
+            <span class="ba-chip-icon">${scenarioDone ? CHECK : icon('pulse', 15)}</span>
+            <span class="ba-chip-label">Scenario</span>
           </a>
-          <a class="ba-chip ${met ? 'done' : ''}" href="#/profile" style="--cc:var(--ba-gold)">
-            <span class="ba-chip-icon">${met ? '✓' : '⚑'}</span><span class="ba-chip-label">Goal</span>
-          </a>
+          ${due.length
+            ? `<a class="ba-chip" href="#/review" style="--cc:var(--ba-gold)">
+                 <span class="ba-chip-icon">${icon('time', 15)}</span>
+                 <span class="ba-chip-label">Review · ${due.length}</span>
+               </a>`
+            : `<span class="ba-chip done" style="--cc:var(--ba-gold)">
+                 <span class="ba-chip-icon">${CHECK}</span>
+                 <span class="ba-chip-label">Review</span>
+               </span>`}
         </div>
       </div>
 
@@ -258,6 +281,7 @@ function viewHome() {
               <span class="ba-unit-row">
                 <span class="ba-unit-dot"></span>
                 <span class="ba-unit-title">${esc(t.title)}</span>
+                ${stockChip(t)}
                 <span class="ba-unit-count">${d}/${total}</span>
                 <span class="ba-unit-chev">▼</span>
               </span>
@@ -331,6 +355,72 @@ function viewTrack(id) {
     ${footerCta()}`);
 }
 
+// ── Review ──────────────────────────────────────────────────
+/** The spaced-repetition queue. Opening one replays its questions only —
+ *  the teaching has already been read, which is what `recap` means. */
+function viewReview() {
+  setImmersive(false);
+  const due = dueReviews();
+  const lessonById = {};
+  for (const t of TRACKS) for (const m of t.modules) for (const l of m.lessons) {
+    lessonById[l.id] = { lesson: l, track: t };
+  }
+
+  render(`
+    <a class="ba-back" href="#/">← Your path</a>
+    <div class="ba-card">
+      <p class="ba-eyebrow">Review</p>
+      <h1 class="ba-h1">${due.length ? `${due.length} lesson${due.length === 1 ? '' : 's'} due` : 'Nothing due'}</h1>
+      <p class="ba-sub">${due.length
+        ? 'Questions only — you’ve already read the material. Score 80% or more and the next review moves further out.'
+        : 'Reviews are scheduled as you finish lessons. Come back when one falls due.'}</p>
+    </div>
+    ${due.map((id) => {
+      const e = lessonById[id];
+      if (!e) return '';
+      const r = (state.reviews || {})[id] || {};
+      return `
+        <a class="ba-lesson" href="#/review/${esc(id)}" style="--tc:${esc(e.track.color)}">
+          <span class="ba-lesson-mark">${icon('time', 14)}</span>
+          <span class="ba-lesson-title">${esc(e.lesson.title)}
+            <em class="ba-lesson-track">${esc(e.track.title)}</em></span>
+          <span class="ba-lesson-xp">${state.scores[id] !== undefined ? state.scores[id] + '%' : ''}</span>
+        </a>`;
+    }).join('')}
+    ${footerCta()}`);
+}
+
+// ── Badges ──────────────────────────────────────────────────
+function viewBadges() {
+  setImmersive(false);
+  const earned = new Set(earnedBadgeIds());
+  const owned = new Set(state.stockBadges || []);
+
+  const card = (b, got, sub) => `
+    <div class="ba-badge ${got ? 'got' : ''}" style="--bc:${esc(b.color)}">
+      <span class="ba-badge-disc">${icon(b.icon, 26, got ? b.color : undefined)}</span>
+      <span class="ba-badge-title">${esc(b.title)}</span>
+      <span class="ba-badge-desc">${esc(got ? b.description : (sub || b.description))}</span>
+    </div>`;
+
+  render(`
+    <a class="ba-back" href="#/">← Your path</a>
+    <div class="ba-card">
+      <p class="ba-eyebrow">Trophy case</p>
+      <h1 class="ba-h1">${earned.size}/${BADGES.length} badges</h1>
+      <p class="ba-sub">${owned.size}/${STOCKS.length} stocks collected — stocks drop at random
+        as you finish lessons in each track.</p>
+    </div>
+
+    <h2 class="ba-section-title">Achievements</h2>
+    <div class="ba-badges">${BADGES.map((b) => card(b, earned.has(b.id))).join('')}</div>
+
+    <h2 class="ba-section-title">Stock collection</h2>
+    <div class="ba-badges">${STOCKS.map((st) =>
+      card(st, owned.has(st.id), 'Not collected yet')).join('')}</div>
+    ${footerCta()}`);
+}
+
 // ── Profile ─────────────────────────────────────────────────
 function viewProfile() {
   setImmersive(false);
@@ -357,6 +447,15 @@ function viewProfile() {
       <div class="ba-stat"><span class="ba-stat-v" id="s2">0</span><span class="ba-stat-l">Day streak</span></div>
       <div class="ba-stat"><span class="ba-stat-v" id="s3">0</span><span class="ba-stat-l">Avg score</span></div>
     </div>
+
+    <a class="ba-card ba-rowlink" href="#/badges">
+      <span class="ba-rowlink-icon">${icon('trophy', 18, 'var(--ba-gold)')}</span>
+      <span class="ba-rowlink-text">
+        <strong>Trophy case</strong>
+        <em>${earnedBadgeIds().length}/${BADGES.length} badges · ${(state.stockBadges || []).length}/${STOCKS.length} stocks</em>
+      </span>
+      <span class="ba-rowlink-chev">→</span>
+    </a>
 
     <div class="ba-card">
       <h2 class="ba-h2">Career ladder</h2>
@@ -435,6 +534,11 @@ function route() {
   if (!session) return viewOnboarding(true);
 
   if (h === '#/profile') return viewProfile();
+  if (h === '#/badges') return viewBadges();
+  if (h === '#/scenario') return viewScenario();
+  if (h === '#/review') return viewReview();
+  const review = h.match(/^#\/review\/(.+)$/);
+  if (review) return viewLesson(review[1], true);   // recap: questions only
   const track = h.match(/^#\/track\/(.+)$/);
   if (track) return viewTrack(track[1]);
   const lesson = h.match(/^#\/lesson\/(.+)$/);
@@ -460,6 +564,9 @@ supabase.auth.onAuthStateChange(async (_e, s) => {
   if (data.session) {
     try { await syncNow(); await pushIdentity(); } catch {}
   }
+  // A learner arriving with months of synced progress has already "earned"
+  // most badges; record them as seen so only genuinely new ones celebrate.
+  primeBadgesSeen(); save();
   const back = consumeReturnHash();
   if (back && back !== (window.location.hash || '')) {
     window.location.hash = back; // fires hashchange -> route()

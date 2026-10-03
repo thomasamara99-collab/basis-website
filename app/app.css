@@ -782,3 +782,135 @@ body.ba-immersive .ba-shell { max-width: none; padding: 0; }
 .nav-links a { color: var(--ba-muted); }
 .nav-links a:hover { color: var(--ba-ink); }
 .nav-toggle span { background: var(--ba-ink); }
+
+/* ============================================================
+   REWARDS, SCENARIO, REVIEW, TROPHY CASE
+   ============================================================ */
+
+.ba-ion { display: block; }
+
+/* ── Badge / stock celebration ──────────────────────────── */
+.ba-celebrate {
+  position: relative; overflow: hidden;
+  min-height: 100svh;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  text-align: center; gap: var(--ba-sp-lg);
+  padding: var(--ba-sp-xxl) var(--ba-sp-lg);
+  max-width: 440px; margin-inline: auto;
+}
+.ba-celebrate-eyebrow {
+  font-size: 12px; font-weight: 800; letter-spacing: 0.18em;
+  text-transform: uppercase; color: var(--ba-muted);
+}
+.ba-celebrate-disc {
+  width: 112px; height: 112px; border-radius: 50%;
+  background: color-mix(in srgb, var(--bc) 18%, transparent);
+  display: grid; place-items: center;
+  animation: ba-pop 0.5s cubic-bezier(.2,1.5,.4,1) both;
+}
+.ba-celebrate-title {
+  font-family: var(--ba-font-display);
+  font-size: var(--ba-type-h1-size); line-height: var(--ba-type-h1-lh);
+  letter-spacing: var(--ba-type-h1-ls);
+  font-weight: 700; color: var(--ba-ink);
+}
+.ba-celebrate-desc { font-size: 15px; line-height: 1.6; color: var(--ba-muted2); max-width: 32ch; }
+.ba-celebrate-xp {
+  font-family: var(--ba-font-display); font-size: 14px; font-weight: 700;
+  color: var(--bc); background: color-mix(in srgb, var(--bc) 14%, transparent);
+  border-radius: 999px; padding: 7px 16px;
+}
+.ba-celebrate-btn { background: var(--bc); color: #fff; max-width: 280px; margin-top: var(--ba-sp-lg); }
+
+/* ── Promotion ──────────────────────────────────────────── */
+.ba-promo-screen {
+  position: relative; overflow: hidden;
+  min-height: 100svh;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  text-align: center; gap: var(--ba-sp-md);
+  padding: var(--ba-sp-xxl) var(--ba-sp-lg);
+  max-width: 440px; margin-inline: auto;
+}
+/* Full-bleed canvas behind a width-constrained column, so the gradient reaches
+   the edges instead of ending with the content. */
+.ba-promo-screen::before {
+  content: ''; position: fixed; inset: 0; z-index: -1;
+  background: radial-gradient(120% 80% at 50% 0%, #2A1A52 0%, var(--ba-bg) 70%);
+}
+.ba-promo-mascot { animation: ba-pop 0.5s cubic-bezier(.2,1.4,.4,1) both; }
+.ba-promo-label { font-size: 13px; color: var(--ba-muted); }
+.ba-promo-title {
+  font-family: var(--ba-font-display);
+  font-size: var(--ba-type-display-size); line-height: var(--ba-type-display-lh);
+  letter-spacing: var(--ba-type-display-ls);
+  font-weight: 700; color: var(--ba-gold);
+}
+.ba-promo-from { font-size: 13px; color: var(--ba-muted); }
+.ba-promo-from strong { color: var(--ba-ink); }
+.ba-promo-blurb { font-size: 14px; line-height: 1.6; color: var(--ba-muted2); max-width: 34ch; }
+.ba-promo-screen .ba-done-stats { width: 100%; margin-block: var(--ba-sp-lg); }
+.ba-promo-screen .ba-btn { width: 100%; max-width: 320px; }
+
+/* ── Scenario ───────────────────────────────────────────── */
+.ba-cat {
+  font-size: 10.5px; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase;
+  color: var(--ba-primary); background: var(--ba-primary-tint);
+  border-radius: 999px; padding: 4px 10px;
+}
+.ba-ex-prompt {
+  font-size: 15px; line-height: 1.55; color: var(--ba-ink);
+  background: var(--ba-surface); border: 1px solid var(--ba-card-border);
+  border-radius: var(--ba-r-lg); padding: var(--ba-sp-lg); margin-bottom: var(--ba-sp-lg);
+}
+
+/* ── Review queue ───────────────────────────────────────── */
+.ba-lesson-track { display: block; font-style: normal; font-size: 12px; color: var(--ba-muted); margin-top: 2px; }
+.ba-lesson .ba-lesson-mark { display: grid; place-items: center; color: var(--ba-gold); }
+
+/* ── Trophy case ────────────────────────────────────────── */
+.ba-badges {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: var(--ba-sp-md); margin-bottom: var(--ba-sp-xl);
+}
+.ba-badge {
+  background: var(--ba-surface); border: 1px solid var(--ba-card-border);
+  border-radius: var(--ba-r-lg); padding: var(--ba-sp-lg);
+  text-align: center; opacity: 0.45;
+}
+.ba-badge.got { opacity: 1; border-color: color-mix(in srgb, var(--bc) 40%, transparent); }
+.ba-badge-disc {
+  width: 48px; height: 48px; border-radius: 50%; margin: 0 auto var(--ba-sp-md);
+  display: grid; place-items: center;
+  background: var(--ba-day-empty-bg); color: var(--ba-muted);
+}
+.ba-badge.got .ba-badge-disc { background: color-mix(in srgb, var(--bc) 16%, transparent); }
+.ba-badge-title {
+  display: block; font-family: var(--ba-font-display);
+  font-size: 14px; font-weight: 700; color: var(--ba-ink); margin-bottom: 4px;
+}
+.ba-badge-desc { display: block; font-size: 11.5px; line-height: 1.45; color: var(--ba-muted); }
+
+/* ── Stock chip on a track header ───────────────────────── */
+.ba-stockchip {
+  display: inline-flex; align-items: center; gap: 4px;
+  font-size: 10.5px; font-weight: 700; font-variant-numeric: tabular-nums;
+  color: var(--ba-muted); background: var(--ba-day-empty-bg);
+  border-radius: 999px; padding: 3px 8px;
+}
+.ba-stockchip.got { color: var(--tc); background: color-mix(in srgb, var(--tc) 14%, transparent); }
+
+/* ── Row link (Profile -> trophy case) ──────────────────── */
+.ba-rowlink { display: flex; align-items: center; gap: var(--ba-sp-lg); text-decoration: none; }
+.ba-rowlink-icon {
+  width: 40px; height: 40px; border-radius: 50%; flex-shrink: 0;
+  display: grid; place-items: center;
+  background: color-mix(in srgb, var(--ba-gold) 14%, transparent);
+}
+.ba-rowlink-text { flex: 1; min-width: 0; }
+.ba-rowlink-text strong { display: block; font-family: var(--ba-font-display); font-size: 15px; font-weight: 700; color: var(--ba-ink); }
+.ba-rowlink-text em { display: block; font-style: normal; font-size: 12.5px; color: var(--ba-muted); margin-top: 2px; }
+.ba-rowlink-chev { color: var(--ba-muted); font-size: 16px; }
+
+@media (prefers-reduced-motion: reduce) {
+  .ba-celebrate-disc, .ba-promo-mascot { animation: none; }
+}

@@ -27,6 +27,16 @@ const LESSONS_SRC = '/app/curriculum-lessons.js';
 export const TRACKS = window.__BASIS_TRACKS__ || [];
 export const LEVELS = window.__BASIS_LEVELS__ || [];
 
+// Gamification data — generated from src/data by `npm run generate:web-data`.
+export const SCENARIOS = window.__BASIS_SCENARIOS__ || [];
+export const SCENARIO_XP = window.__BASIS_SCENARIO_XP__ || 30;
+export const BADGES = window.__BASIS_BADGES__ || [];
+export const STOCKS = window.__BASIS_STOCKS__ || [];
+
+/** trackId -> its stock badges, same shape as TRACK_STOCKS in the app. */
+export const TRACK_STOCKS = {};
+for (const s of STOCKS) (TRACK_STOCKS[s.trackId] ||= []).push(s);
+
 export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
   auth: { detectSessionInUrl: true, persistSession: true, flowType: 'pkce' },
 });
@@ -83,6 +93,11 @@ const blank = () => ({
   avatarId: 'mascot_violet',
   theme: 'dark',        // matches the app's default (useThemeStore)
   dayXp: {},             // { 'YYYY-MM-DD': xp } — powers the daily goal ring
+  // Spaced repetition: lessonId -> { nextReview, interval }, same shape and
+  // same schedule rule as useProgressStore.scheduleReview.
+  reviews: {},
+  stockBadges: [],       // unlocked stock badge ids
+  badgesSeen: [],        // badge ids already celebrated, so they fire once
 });
 
 export let state = load();
@@ -190,6 +205,101 @@ export function addDayXp(n) {
   const cutoff = new Date(); cutoff.setDate(cutoff.getDate() - 14);
   const min = todayKey(cutoff);
   for (const k of Object.keys(state.dayXp)) if (k < min) delete state.dayXp[k];
+}
+
+// ── Spaced repetition ───────────────────────────────────────
+/** >=80% doubles the interval (max 30 days); below that resets to 1 day. */
+export function scheduleReview(lessonId, correct, total) {
+  const existing = (state.reviews || {})[lessonId];
+  const passed = total > 0 && correct / total >= 0.8;
+  const interval = existing ? (passed ? Math.min(existing.interval * 2, 30) : 1) : 1;
+  const d = new Date();
+  d.setDate(d.getDate() + interval);
+  state.reviews = { ...(state.reviews || {}), [lessonId]: { nextReview: todayKey(d), interval } };
+}
+
+/** Completed lessons whose nextReview has come round, soonest first. */
+export function dueReviews() {
+  const t = todayKey();
+  return Object.entries(state.reviews || {})
+    .filter(([id, r]) => state.completed[id] && r.nextReview <= t)
+    .sort(([, a], [, b]) => a.nextReview.localeCompare(b.nextReview))
+    .map(([id]) => id);
+}
+
+// ── Daily scenario ──────────────────────────────────────────
+/** Deterministic per calendar day and identical for everyone, exactly like
+ *  getDailyScenario in the app; the option ORDER is shuffled per client, which
+ *  is what the app does too (the pool is authored correct-answer-first). */
+export function dailyScenario(dateKey = todayKey()) {
+  if (!SCENARIOS.length) return null;
+  const n = parseInt(dateKey.replace(/-/g, ''), 10) || 0;
+  const q = SCENARIOS[n % SCENARIOS.length];
+  const correct = q.options[q.correctIndex];
+  const options = [...q.options].sort(() => Math.random() - 0.5);
+  return { ...q, options, correctIndex: options.indexOf(correct) };
+}
+
+export const scenarioKey = (d = todayKey()) => 'scenario:' + d;
+export const scenarioDoneToday = () => !!state.completed[scenarioKey()];
+
+// ── Badges ──────────────────────────────────────────────────
+/** Mirrors badgeContext() in src/data/badges.ts. */
+export function badgeContext() {
+  const completed = state.completed || {};
+  const ids = Object.keys(completed);
+  return {
+    xp: state.xp,
+    streak: state.streak,
+    completed,
+    lessonsCompleted: ids.filter((k) => !k.startsWith('scenario:')).length,
+    scenariosCompleted: ids.filter((k) => k.startsWith('scenario:')).length,
+  };
+}
+
+/** The same evaluator as ruleMet() in the app — the rules come from there. */
+export function ruleMet(rule, c) {
+  switch (rule.kind) {
+    case 'lessons': return c.lessonsCompleted >= rule.n;
+    case 'streak': return c.streak >= rule.n;
+    case 'xp': return c.xp >= rule.n;
+    case 'scenarios': return c.scenariosCompleted >= rule.n;
+    case 'ids-all': return rule.ids.every((id) => c.completed[id]);
+    case 'ids-any': return rule.ids.some((id) => c.completed[id]);
+    default: return false;
+  }
+}
+
+export function earnedBadgeIds(ctx = badgeContext()) {
+  return BADGES.filter((b) => ruleMet(b.rule, ctx)).map((b) => b.id);
+}
+
+/** Badges earned since the last check, marked seen so each fires once. */
+export function newlyEarnedBadges() {
+  const seen = new Set(state.badgesSeen || []);
+  const fresh = earnedBadgeIds().filter((id) => !seen.has(id));
+  state.badgesSeen = [...seen, ...fresh];
+  return fresh.map((id) => BADGES.find((b) => b.id === id)).filter(Boolean);
+}
+
+/** Record every already-earned badge WITHOUT celebrating — used once, when a
+ *  returning learner's synced progress would otherwise fire a dozen popups. */
+export function primeBadgesSeen() {
+  if ((state.badgesSeen || []).length) return;
+  state.badgesSeen = earnedBadgeIds();
+}
+
+export const STOCK_DROP_CHANCE = 0.3;   // per new lesson, as in the app
+export const STOCK_XP = 25;
+
+/** 30% chance of an uncollected stock from this track's pool, as in the app. */
+export function rollStockBadge(trackId) {
+  const owned = new Set(state.stockBadges || []);
+  const pool = (TRACK_STOCKS[trackId] || []).filter((s) => !owned.has(s.id));
+  if (!pool.length || Math.random() >= STOCK_DROP_CHANCE) return null;
+  const pick = pool[Math.floor(Math.random() * pool.length)];
+  state.stockBadges = [...(state.stockBadges || []), pick.id];
+  return pick;
 }
 
 export function xpToday() {
