@@ -16,7 +16,7 @@
    ============================================================ */
 import {
   render, go, esc, setImmersive, APP_STORE, TRACKS, session, setPremium,
-  oauth, syncNow,
+  oauth, syncNow, pushPremium,
 } from '/app/core.js';
 import {
   isBillingConfigured, initBilling, getPackages, priceString, purchase,
@@ -45,7 +45,8 @@ export async function viewPaywall(L, failure) {
     const entitled = await checkEntitlement();
     if (entitled) {
       setPremium(true);
-      return go('#/lesson/' + L.id); // re-enter, now unlocked
+      await pushPremium(true);        // the server gate reads profiles.is_premium
+      return go('#/lesson/' + L.id);  // re-enter, now unlocked
     }
     pkgs = await getPackages();
   }
@@ -134,8 +135,10 @@ export async function viewPaywall(L, failure) {
       busy = false;
       if (res.ok) {
         setPremium(true);
-        // The webhook writes profiles.is_premium; pull it so the server-side
-        // gate and this page agree before we re-enter the lesson.
+        // get_premium_lesson() gates on profiles.is_premium, so that column has
+        // to be true before we re-enter the lesson or the unlock bounces right
+        // back here. Write it, then re-read so page and server agree.
+        await pushPremium(true);
         await syncNow().catch(() => {});
         return go('#/lesson/' + L.id);
       }

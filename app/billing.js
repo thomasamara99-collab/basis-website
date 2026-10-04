@@ -30,7 +30,7 @@
    ============================================================ */
 
 /** Public Web Billing API key — starts with `rcb_`. Empty = billing off. */
-export const RC_PUBLIC_KEY = '';
+export const RC_PUBLIC_KEY = 'rcb_yvmSdDfdSSoqtQlSsfXSXtyBJIZD';
 
 /** Must match the RevenueCat dashboard exactly (and src/lib/purchases.ts). */
 export const ENTITLEMENT_ID = 'Basis Finance Pro';

@@ -24,6 +24,17 @@ import { diagram } from '/app/diagrams.js';
 import { viewPaywall } from '/app/paywall.js';
 import { celebrateBadge, celebratePromotion, runRewards } from '/app/celebrate.js';
 
+// The illustration bundle is ~167 KB of SVG; the path and profile screens
+// never draw one, so it's fetched when a lesson actually opens.
+let art = { lessonArt: () => '', sectionArt: () => '' };
+async function ensureArt() {
+  if (art.loaded) return;
+  try {
+    const m = await import('/app/illustrations.js');
+    art = { lessonArt: m.lessonArt, sectionArt: m.sectionArt, loaded: true };
+  } catch { art.loaded = true; }   // lesson still reads fine without pictures
+}
+
 let timerId = null;
 function clearTimer() { if (timerId) { clearInterval(timerId); timerId = null; } }
 
@@ -33,7 +44,7 @@ export async function viewLesson(id, recap = false) {
   render('<div class="ba-loading">Loading lesson…</div>');
 
   try {
-    await ensureLessons();
+    await Promise.all([ensureLessons(), ensureArt()]);
   } catch {
     return render(`<div class="ba-card"><p class="ba-sub">Couldn’t load the lesson.
       Check your connection and try again.</p></div>`);
@@ -95,13 +106,14 @@ function play(L, recap) {
         <article class="ba-tc lead"><div class="ba-tc-inner">
           <p class="ba-tc-eyebrow">${esc(L.trackTitle)}</p>
           <h1 class="ba-tc-title">${esc(L.title)}</h1>
+          ${art.lessonArt(L.id)}
           <div class="ba-tc-lead">${richBlocks(c.body)}</div>
         </div></article>`;
     }
     return `
       <article class="ba-tc"><div class="ba-tc-inner">
         ${c.heading ? `<h2 class="ba-tc-heading">${esc(c.heading)}</h2>` : ''}
-        ${c.visual ? diagram(c.visual, L.color) : ''}
+        ${c.visual ? diagram(c.visual, L.color) : art.sectionArt(L.id, i - 1)}
         <div class="ba-tc-body">${richBlocks(c.body)}</div>
         ${c.formula ? `<div class="ba-formula">${esc(c.formula)}</div>` : ''}
         ${c.bullets && c.bullets.length

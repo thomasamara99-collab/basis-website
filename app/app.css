@@ -914,3 +914,21 @@ body.ba-immersive .ba-shell { max-width: none; padding: 0; }
 @media (prefers-reduced-motion: reduce) {
   .ba-celebrate-disc, .ba-promo-mascot { animation: none; }
 }
+
+/* ── Lesson illustrations (rendered from the app's own components) ──────── */
+/* The artwork's palette (src/components/illustrations/palette.ts) puts its
+   labels in near-black ink "on canvas", i.e. it is drawn for a LIGHT
+   background. So the tile stays light in both themes rather than following
+   --ba-surface — on the dark canvas those labels would vanish. */
+.ba-art {
+  background: #F1EFFE;
+  border-radius: var(--ba-r-lg);
+  padding: var(--ba-sp-lg);
+  margin-bottom: var(--ba-sp-xl);
+  display: grid; place-items: center;
+}
+.ba-art svg { display: block; width: 100%; max-width: 260px; height: auto; }
+/* The hero keeps the light tile for the same reason — its labels sit on the
+   canvas too, so a transparent hero would lose them on the dark theme. */
+.ba-art.hero { padding: var(--ba-sp-xl); }
+.ba-art.hero svg { max-width: 240px; }

@@ -177,6 +177,22 @@ export async function syncNow() {
 
 export function setPremium(v) { isPremium = !!v; }
 
+/**
+ * Mirror RevenueCat's verdict into profiles.is_premium.
+ *
+ * get_premium_lesson() reads that column, so without a writer a web purchase
+ * unlocks the UI and then fails to fetch the lesson. The RevenueCat webhook is
+ * the proper writer; until it's deployed this does what the iOS app already
+ * does from src/lib/premiumSync.ts — same RPC, same trust model, so it adds no
+ * attack surface that isn't already there. Once the webhook is live and
+ * supabase/harden-premium.sql has revoked the grant this call simply no-ops,
+ * which is why its failure is swallowed.
+ */
+export async function pushPremium(v) {
+  if (!session) return;
+  try { await supabase.rpc('set_premium_status', { p_premium: !!v }); } catch { /* webhook owns it now */ }
+}
+
 /** Push the onboarding-chosen handle/avatar once an account exists. Mirrors
  *  pushInitialIdentity in the app: never clobbers an existing handle, so a
  *  returning user keeps the name their leaderboard entries already carry. */
