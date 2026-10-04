@@ -1,0 +1,41 @@
+# Basis
+
+> Free finance education: 11 tracks, 98 lessons and 449 questions taking you from
+> "what is a stock?" to interview-ready. Every lesson teaches the concept first,
+> then tests it. Playable free in a browser or in the iOS app, plus a daily market
+> simulator built on real financial history.
+
+Basis is made by Thomas Amara. The curriculum is written by hand, not generated:
+each lesson leads with teaching content that must cover everything its quiz asks.
+Nothing on the site is paywalled except the Career Accelerator modules (DCF
+valuation, M&A and LBO), which require a subscription.
+
+## Interview preparation
+
+- [Finance interview questions](https://www.basisfinance.app/interview): Hub for technical interview prep, with a free practice drill on each page.
+- [Walk me through a DCF](https://www.basisfinance.app/interview/walk-me-through-a-dcf): The structured answer to the most-asked banking interview question, plus the follow-ups.
+- [Accounting interview questions](https://www.basisfinance.app/interview/accounting-interview-questions): The three statements, how they link, and the depreciation walk-through.
+- [Valuation interview questions](https://www.basisfinance.app/interview/valuation-interview-questions): The three methodologies, enterprise vs equity value, EV/EBITDA vs P/E.
+- [LBO and private equity questions](https://www.basisfinance.app/interview/lbo-interview-questions): How a leveraged buyout makes money, the three return drivers, IRR vs MOIC.
+- [Markets and macro questions](https://www.basisfinance.app/interview/markets-interview-questions): Rates and indices, pitching a stock, reading the yield curve.
+
+## The app
+
+- [Learn in your browser](https://www.basisfinance.app/app): The full curriculum, free. Teaching cards, then a timed quiz, with XP, streaks and a career ladder.
+- [The Floor](https://www.basisfinance.app/floor): A daily market simulator. Five decisions drawn from real historical episodes, the same five for everyone that day, on a $100k virtual book. Free, no download.
+
+## Explainers
+
+- [Learn hub](https://www.basisfinance.app/learn): 31 explainer articles on core finance concepts.
+- [What is a stock?](https://www.basisfinance.app/learn/what-is-a-stock)
+- [What is a bond?](https://www.basisfinance.app/learn/what-is-a-bond)
+- [What is the yield curve?](https://www.basisfinance.app/learn/what-is-the-yield-curve)
+- [What is a DCF?](https://www.basisfinance.app/learn/what-is-a-dcf)
+- [What is WACC?](https://www.basisfinance.app/learn/what-is-wacc)
+- [What do central banks do?](https://www.basisfinance.app/learn/what-do-central-banks-do)
+
+## Optional
+
+- [Support](https://www.basisfinance.app/support)
+- [Privacy policy](https://www.basisfinance.app/privacy)
+- [Terms of service](https://www.basisfinance.app/terms)
