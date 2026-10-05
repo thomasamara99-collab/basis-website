@@ -1,0 +1,75 @@
+/* ============================================================
+   The drill widget — shared by /interview pages and /learn
+   articles. Builds on the marketing tokens in /styles.css.
+   ============================================================ */
+
+.drill {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  padding: var(--sp-6);
+  margin-block: var(--sp-8);
+}
+
+.drill-intro { margin-bottom: var(--sp-5); }
+.drill-intro h2 { font-family: var(--font-display); font-size: 22px; font-weight: 700; margin-bottom: var(--sp-2); }
+.drill-intro p { color: var(--text-secondary); font-size: 15px; line-height: 1.6; }
+
+.dr-head { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: var(--sp-3); }
+.dr-count { font-size: 11px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-muted); }
+.dr-score { font-size: 12px; color: var(--text-muted); font-variant-numeric: tabular-nums; }
+
+.dr-bar { height: 4px; border-radius: 999px; background: rgba(255,255,255,0.08); overflow: hidden; margin-bottom: var(--sp-5); }
+.dr-bar i { display: block; height: 100%; background: var(--accent); border-radius: 999px; transition: width 0.35s ease; }
+
+.dr-prompt {
+  font-family: var(--font-display);
+  font-size: clamp(18px, 3.4vw, 21px); line-height: 1.4; font-weight: 700;
+  color: var(--text-primary); margin-bottom: var(--sp-5);
+}
+
+.dr-options { display: flex; flex-direction: column; gap: var(--sp-3); margin-bottom: var(--sp-4); }
+.dr-opt {
+  display: flex; gap: var(--sp-3); align-items: flex-start; width: 100%; text-align: left;
+  background: rgba(13,14,18,0.6);
+  border: 1.5px solid var(--border);
+  border-radius: var(--r-md);
+  padding: var(--sp-4);
+  color: var(--text-secondary);
+  font-family: inherit; font-size: 15px; line-height: 1.5;
+  cursor: pointer; transition: border-color 0.15s, background 0.15s;
+}
+.dr-opt:hover:not(:disabled) { border-color: rgba(255,255,255,0.22); }
+.dr-opt:disabled { cursor: default; }
+.dr-key { flex-shrink: 0; width: 14px; font-weight: 700; font-size: 12px; color: var(--text-muted); }
+.dr-opt.sel { border-color: var(--accent); background: var(--accent-muted); color: var(--text-primary); }
+.dr-opt.sel .dr-key { color: var(--accent); }
+.dr-opt.right { border-color: var(--success); background: rgba(34,197,94,0.12); color: var(--text-primary); }
+.dr-opt.right .dr-key { color: var(--success); }
+.dr-opt.wrong { border-color: #F87171; background: rgba(248,113,113,0.12); color: var(--text-primary); }
+.dr-opt.wrong .dr-key { color: #F87171; }
+
+.dr-explain {
+  border: 1px solid var(--hairline); border-radius: var(--r-md);
+  padding: var(--sp-4); margin-bottom: var(--sp-4);
+  font-size: 14.5px; line-height: 1.65; color: var(--text-secondary);
+}
+.dr-explain.right { border-color: rgba(34,197,94,0.3); background: rgba(34,197,94,0.06); }
+.dr-explain.wrong { border-color: rgba(248,113,113,0.3); background: rgba(248,113,113,0.06); }
+.dr-verdict { font-weight: 700; color: var(--text-primary); margin-bottom: var(--sp-2); }
+.dr-explain.right .dr-verdict { color: var(--success); }
+.dr-explain.wrong .dr-verdict { color: #F87171; }
+.dr-source { font-size: 12.5px; color: var(--text-muted); margin-top: var(--sp-3); }
+
+.dr-go { width: 100%; }
+.dr-go:disabled { opacity: 0.4; cursor: not-allowed; }
+
+.dr-result { text-align: center; padding-block: var(--sp-4); }
+.dr-result-score {
+  font-family: var(--font-display); font-size: 44px; font-weight: 700;
+  color: var(--accent); font-variant-numeric: tabular-nums; line-height: 1;
+}
+.dr-result-verdict { font-family: var(--font-display); font-size: 18px; font-weight: 700; color: var(--text-primary); margin-block: var(--sp-3) var(--sp-2); }
+.dr-result-sub { font-size: 14px; line-height: 1.6; color: var(--text-secondary); max-width: 44ch; margin-inline: auto; }
+.dr-result-actions { display: flex; gap: var(--sp-3); justify-content: center; flex-wrap: wrap; margin-top: var(--sp-5); }
+.dr-result-app { font-size: 13px; color: var(--text-muted); margin-top: var(--sp-4); }

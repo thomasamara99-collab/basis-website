@@ -20,6 +20,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="/styles.css" />
+  <link rel="stylesheet" href="/drill/drill.css" />
 
   <script type="application/ld+json">
 {
@@ -235,10 +236,19 @@
         </div>
       </section>
 
+      <section class="drill">
+        <div class="drill-intro">
+          <h2>Test yourself on accounting</h2>
+          <p>Three questions from the Basis curriculum, with the explanation after each one. No account needed.</p>
+        </div>
+        <div id="drill" data-topic="accounting" data-count="3"></div>
+      </section>
+
       <div class="article-cta">
-        <h3>Learn the three statements properly</h3>
-        <p>Basis teaches the concept first, then tests it &mdash; 98 lessons and 449 questions, free in your browser. The accounting track covers the income statement, balance sheet and cash flow statement, and how they link.</p>
-        <a href="/app" class="btn btn-primary btn-lg">Start free in your browser</a>
+        <h3>Don&rsquo;t just read it &mdash; answer it</h3>
+        <p>Basis teaches the concept first and then tests it: 11 tracks, 98 lessons and 449 questions, free in your browser. No download, no payment.</p>
+        <a href="/app" class="btn btn-primary btn-lg">Start learning free</a>
+        <p class="cta-alt">On your phone? <a href="https://apps.apple.com/app/basis-learn-finance-markets/id6784982377" target="_blank" rel="noopener">Get the iOS app</a> for streaks, reminders and the daily market game.</p>
       </div>
     </div>
 
@@ -297,6 +307,10 @@
     });
   </script>
 
+  <script src="/drill/drill-data.js"></script>
+  <script src="/drill/drill.js"></script>
+
+  <script defer src="/app-link.js"></script>
   <script defer src="/_vercel/insights/script.js"></script>
 
 </body>

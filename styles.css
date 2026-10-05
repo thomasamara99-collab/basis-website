@@ -1592,6 +1592,8 @@ summary:hover { background: var(--surface-raised); }
   margin-bottom: var(--sp-10);
 }
 .article-byline span, .article-byline a { color: var(--text-secondary); font-weight: 600; }
+/* With an "also known as" note following, the rule belongs under that instead. */
+.article-byline:has(+ .terms-note) { border-bottom: 0; padding-bottom: 0; margin-bottom: var(--sp-5); }
 .article-byline a:hover { color: var(--text-primary); }
 
 /* Prose */
@@ -1903,4 +1905,27 @@ summary:hover { background: var(--surface-raised); }
   font-size: 12.5px;
   color: var(--text-muted);
   margin-top: var(--sp-3);
+}
+
+/* ── Alternative names ──────────────────────────────────── */
+/* Same concept, different label depending on where you trained. Stating them
+   helps a reader and catches the US phrasings the UK spelling misses. */
+.terms-note {
+  font-size: 13.5px;
+  line-height: 1.6;
+  color: var(--text-muted);
+  background: var(--surface);
+  border-left: 3px solid var(--accent);
+  border-radius: 0 var(--r-md) var(--r-md) 0;
+  padding: var(--sp-3) var(--sp-4);
+  margin-bottom: var(--sp-8);
+}
+.terms-note strong { color: var(--text-secondary); }
+
+/* The secondary route out of an article. Most readers are on desktop, where
+   an App Store link is a dead end, so the web app leads and iOS follows. */
+.cta-alt {
+  font-size: 13.5px;
+  color: var(--text-muted);
+  margin-top: var(--sp-4);
 }

@@ -16,6 +16,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="/styles.css" />
+  <link rel="stylesheet" href="/drill/drill.css" />
 
   <script type="application/ld+json">
 {
@@ -81,6 +82,7 @@
       <p class="article-lead">A bond is a loan you make to an issuer. They borrow your money, pay you interest along the way, and return the original amount at the end. That’s the whole idea — the rest is detail.</p>
       <p class="article-meta">4 min read</p>
       <p class="article-byline">By <a href="/about" rel="author">Thomas Amara</a> &middot; <time datetime="2026-07-22">22 July 2026</time></p>
+      <p class="terms-note"><strong>Also known as:</strong> fixed income security, debt security; gilts (UK), Treasuries (US), Bunds (Germany).</p>
 
       <div class="prose">
         <p>If a <a href="/learn/what-is-a-stock">share</a> makes you an owner, a bond makes you a lender. When you buy a bond, you are lending money to whoever issued it — and they are contractually obliged to pay you back, with interest.</p>
@@ -119,10 +121,19 @@
         </div>
       </div>
 
+      <section class="drill">
+        <div class="drill-intro">
+          <h2>Test yourself on markets and macro</h2>
+          <p>Three questions from the Basis curriculum, with the explanation after each one. No account needed.</p>
+        </div>
+        <div id="drill" data-topic="markets" data-count="3"></div>
+      </section>
+
       <div class="article-cta">
-        <h3>Learn this properly, in five minutes a day</h3>
-        <p>Basis turns concepts like this into short, interactive lessons — with quizzes, XP, and a daily market game built on real financial history.</p>
-        <a href="https://apps.apple.com/app/basis-learn-finance-markets/id6784982377" class="btn btn-primary btn-lg" target="_blank" rel="noopener">Get Basis free</a>
+        <h3>Don&rsquo;t just read it &mdash; answer it</h3>
+        <p>Basis teaches the concept first and then tests it: 11 tracks, 98 lessons and 449 questions, free in your browser. No download, no payment.</p>
+        <a href="/app" class="btn btn-primary btn-lg">Start learning free</a>
+        <p class="cta-alt">On your phone? <a href="https://apps.apple.com/app/basis-learn-finance-markets/id6784982377" target="_blank" rel="noopener">Get the iOS app</a> for streaks, reminders and the daily market game.</p>
       </div>
     </div>
 
@@ -181,6 +192,10 @@
     });
   </script>
 
+  <script src="/drill/drill-data.js"></script>
+  <script src="/drill/drill.js"></script>
+
+  <script defer src="/app-link.js"></script>
   <script defer src="/_vercel/insights/script.js"></script>
 
 </body>
