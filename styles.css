@@ -1579,10 +1579,20 @@ summary:hover { background: var(--surface-raised); }
   font-size: 13px;
   font-weight: 500;
   color: var(--text-muted);
+}
+
+/* Visible author and date. Google treats finance as a high-stakes topic, and
+   expertise it cannot see does not count — the name was only in JSON-LD. */
+.article-byline {
+  font-size: 13px;
+  color: var(--text-muted);
+  margin-top: var(--sp-2);
   padding-bottom: var(--sp-8);
   border-bottom: 1px solid var(--hairline);
   margin-bottom: var(--sp-10);
 }
+.article-byline span, .article-byline a { color: var(--text-secondary); font-weight: 600; }
+.article-byline a:hover { color: var(--text-primary); }
 
 /* Prose */
 .prose { color: #DcDfE6; }
@@ -1833,3 +1843,45 @@ summary:hover { background: var(--surface-raised); }
 }
 
 .reviews-link:hover { text-decoration: underline; }
+
+/* ── Article tables ─────────────────────────────────────── */
+/* Comparison tables are the format the "is X the same as Y?" queries want,
+   so they need to work on the /learn template, not just inside the app. */
+.table-wrap {
+  overflow-x: auto;
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  background: var(--surface);
+  margin-block: var(--sp-6);
+}
+.prose table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14.5px;
+  min-width: 460px;
+}
+.prose th,
+.prose td {
+  text-align: left;
+  vertical-align: top;
+  padding: 11px 14px;
+  border-bottom: 1px solid var(--hairline);
+  line-height: 1.55;
+}
+.prose tr:last-child td { border-bottom: 0; }
+.prose th {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  background: var(--surface-raised);
+  white-space: nowrap;
+}
+.prose td { color: var(--text-secondary); }
+.prose td:first-child { color: var(--text-primary); font-weight: 500; }
+.prose td.num, .prose th.num {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
