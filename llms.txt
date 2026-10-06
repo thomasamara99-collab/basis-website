@@ -26,7 +26,8 @@ valuation, M&A and LBO), which require a subscription.
 
 ## Explainers
 
-- [Learn hub](https://www.basisfinance.app/learn): 31 explainer articles on core finance concepts.
+- [The Duolingo for finance](https://www.basisfinance.app/duolingo-for-finance): How the Duolingo method maps onto finance, feature by feature, with a playable Floor decision and a comparison against other ways to learn.
+- [Learn hub](https://www.basisfinance.app/learn): 32 explainer articles on core finance concepts.
 - [What is a stock?](https://www.basisfinance.app/learn/what-is-a-stock)
 - [What is a bond?](https://www.basisfinance.app/learn/what-is-a-bond)
 - [What is the yield curve?](https://www.basisfinance.app/learn/what-is-the-yield-curve)
